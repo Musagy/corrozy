@@ -1,0 +1,10 @@
+int edad = 25;
+float precio = 19.99;
+str nombre = "Juan";
+bool activo = true;
+var cualquier_cosa = "dinámico";
+
+println(edad);
+println(precio);
+println(nombre);
+println(activo);

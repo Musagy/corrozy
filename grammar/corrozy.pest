@@ -1,0 +1,94 @@
+WHITESPACE = _{ " " | "\t" | "\n" | "\r" }
+COMMENT = _{ "//" ~ (!"\n" ~ ANY)* | "/*" ~ (!"*/" ~ ANY)* ~ "*/" }
+
+program = { SOI ~ statement* ~ EOI }
+
+statement = {
+    variable_declaration
+  | print_statement      // AGREGAR
+  | println_statement    // AGREGAR
+  | function_declaration
+  | expression_statement
+  | if_statement
+  | while_loop
+  | for_loop
+}
+
+// *************************************
+// * Base grammar for Corrozy language *
+// *************************************
+
+// Types
+type_annotation = { "int" | "str" | "bool" | "float" | "var" }
+
+// Expressions
+expression = { binary_expression | primary_expression }
+
+// Binary operators
+binary_operator = { "+" | "-" | "*" | "/" | "==" | "!=" | "<" | ">" | "<=" | ">=" | "&&" | "||" }
+
+// Binary expressions
+binary_expression = { primary_expression ~ (binary_operator ~ primary_expression)+ }
+
+// Primary expressions
+primary_expression = {
+    function_call
+  | literal
+  | identifier
+  | "(" ~ expression ~ ")"
+}
+
+// Literals
+literal = { float | integer | string | boolean }
+integer = @{ ASCII_DIGIT+ }
+float = @{ ASCII_DIGIT+ ~ "." ~ ASCII_DIGIT+ }
+string = @{ "\"" ~ (!"\"" ~ ANY)* ~ "\"" }
+boolean = { "true" | "false" }
+
+// Expression statements
+expression_statement = { expression ~ ";" }
+
+
+// ****************************************
+// * Primary grammar for Corrozy language *
+// ****************************************
+
+// Variable declarations
+variable_declaration = {
+    type_annotation ~ identifier ~ "=" ~ expression ~ ";"
+}
+
+// Print statements
+print_statement = { "print" ~ "(" ~ expression ~ ")" ~ ";" }
+println_statement = { "println" ~ "(" ~ expression ~ ")" ~ ";" }
+
+// Parameters
+parameter = { type_annotation ~ identifier }
+parameter_list = { parameter ~ ("," ~ parameter)* }
+
+// Function declarations
+function_declaration = {
+    "fn" ~ identifier ~ "(" ~ parameter_list? ~ ")" ~ return_type? ~ block
+}
+
+// return type 
+return_type = { "->" ~ type_annotation }
+
+// Code block
+block = { "{" ~ statement* ~ "}" }
+
+// Function calls
+function_call = { identifier ~ "(" ~ argument_list? ~ ")" }
+argument_list = { expression ~ ("," ~ expression)* }
+
+// identifier
+identifier = @{ ASCII_ALPHA ~ (ASCII_ALPHANUMERIC | "_")* }
+
+// Valid identifiers
+if_statement = { "if" ~ "(" ~ expression ~ ")" ~ block ~ else_clause? }
+else_clause = { "else" ~ (if_statement | block) }
+
+// Flux control statements
+while_loop = { "while" ~ "(" ~ expression ~ ")" ~ block }
+for_loop = { "for" ~ "(" ~ for_init? ~ ";" ~ expression? ~ ";" ~ expression? ~ ")" ~ block }
+for_init = { variable_declaration | expression }

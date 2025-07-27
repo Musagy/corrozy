@@ -1,0 +1,6 @@
+str name = "diego";
+int age = 23;
+
+println("Hello");
+println(name);
+println(age);
