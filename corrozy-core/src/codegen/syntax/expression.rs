@@ -13,8 +13,8 @@ impl ExpressionGen {
         match expr {
             Expression::Literal(lit) => {
                 let raw = lit.to_php();
-                let trimmed = raw.trim_matches('"').to_string();
-                Ok(trimmed)
+                // let trimmed = raw.trim_matches('"').to_string();
+                Ok(raw)
             }
             Expression::Variable(name) => {
                 Ok(format!("${}", name))

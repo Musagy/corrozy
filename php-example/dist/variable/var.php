@@ -8,10 +8,10 @@ $edad = 25;
 /** @var float $precio */
 $precio = 19.99;
 /** @var string $nombre */
-$nombre = Juan;
+$nombre = "Juan";
 /** @var bool $activo */
 $activo = true;
-$cualquier_cosa = dinámico;
+$cualquier_cosa = "dinámico";
 echo "$edad\n";
 echo "$precio\n";
 echo "$nombre\n";

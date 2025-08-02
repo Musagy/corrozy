@@ -4,14 +4,14 @@ use crate::{codegen::syntax::block::BlockGenerator, parser::ast::{AstNode, Block
 
 pub struct FunctionGenerator<'a> {
     config: &'a Config,
-    block_gen: BlockGenerator<'a>,
+    block_gen: BlockGenerator,
 }
 
 impl<'a> FunctionGenerator<'a> {
     pub fn new(config: &'a Config) -> Self {
         Self {
             config,
-            block_gen: BlockGenerator::new(config),
+            block_gen: BlockGenerator::new(),
         }
     }
 
@@ -28,7 +28,7 @@ impl<'a> FunctionGenerator<'a> {
     {
         let mut result = String::new();
 
-        if self.config.transpiler.include_comments {
+        if self.config.transpiler.include_comments && (!params.is_empty() || return_type.is_some()) {
             result.push_str(&self.generate_doc(params, return_type));
         }
 

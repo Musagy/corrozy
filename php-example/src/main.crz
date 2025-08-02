@@ -15,12 +15,13 @@ println(name);
 println(age);
 
 // This is a function
-// fn hello() {
-//   println("Hello from a function");
-// }
+fn hello() {
+  println("Hello from a function");
+}
+hello();
 
 // const a = (): int => {
-//   println("Hello from an arrow function");
+// println("Hello from an arrow function");
 //   return 1;
 // }
 

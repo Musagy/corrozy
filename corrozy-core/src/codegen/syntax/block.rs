@@ -1,17 +1,15 @@
 use anyhow::Result;
 
-use crate::{codegen::syntax::expression::ExpressionGen, parser::ast::{AstNode, Block}, Config};
+use crate::{codegen::syntax::expression::ExpressionGen, parser::ast::{AstNode, Block}};
 
 
-pub struct BlockGenerator<'a> {
-    config: &'a Config,
+pub struct BlockGenerator {
     expression_gen: ExpressionGen,
 }
 
-impl<'a> BlockGenerator<'a> {
-    pub fn new(config: &'a Config) -> Self {
-        Self { 
-            config,
+impl BlockGenerator {
+    pub fn new() -> Self {
+        Self {
             expression_gen: ExpressionGen::new(),
         }
     }
