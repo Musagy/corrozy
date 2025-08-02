@@ -1,0 +1,155 @@
+{
+    "name": "Corrozy",
+    "scopeName": "source.corrozy",
+    "fileTypes": ["crz"],
+    "patterns": [
+        { "include": "#comments" },
+        { "include": "#keywords" },
+        { "include": "#types" },
+        { "include": "#functions" },
+        { "include": "#strings" },
+        { "include": "#numbers" },
+        { "include": "#operators" },
+        { "include": "#identifiers" }
+    ],
+    "repository": {
+        "comments": {
+            "patterns": [
+                {
+                    "name": "comment.line.double-slash.corrozy",
+                    "match": "//.*$"
+                },
+                {
+                    "name": "comment.block.corrozy",
+                    "begin": "/\\*",
+                    "end": "\\*/",
+                    "patterns": [
+                        {
+                            "name": "comment.block.corrozy",
+                            "match": "."
+                        }
+                    ]
+                }
+            ]
+        },
+        "keywords": {
+            "patterns": [
+                {
+                    "name": "keyword.control.corrozy",
+                    "match": "\\b(if|else|while|for|return)\\b"
+                },
+                {
+                    "name": "keyword.other.corrozy",
+                    "match": "\\b(let|const|fn)\\b"
+                },
+                {
+                    "name": "keyword.other.corrozy",
+                    "match": "\\b(print|println)\\b"
+                },
+                {
+                    "name": "constant.language.boolean.corrozy",
+                    "match": "\\b(true|false)\\b"
+                }
+            ]
+        },
+        "types": {
+            "patterns": [
+                {
+                    "name": "storage.type.primitive.corrozy",
+                    "match": "\\b(int|string|bool|float|any)\\b"
+                },
+                {
+                    "name": "storage.type.custom.corrozy",
+                    "match": "\\b[A-Z][A-Za-z0-9_]*\\b"
+                }
+            ]
+        },
+        "functions": {
+            "patterns": [
+                {
+                    "name": "entity.name.function.corrozy",
+                    "match": "\\b([a-zA-Z_][a-zA-Z0-9_]*)\\s*(?=\\()",
+                    "captures": {
+                        "1": { "name": "entity.name.function.corrozy" }
+                    }
+                },
+                {
+                    "name": "meta.function.declaration.corrozy",
+                    "begin": "\\b(fn)\\s+([a-zA-Z_][a-zA-Z0-9_]*)\\s*\\(",
+                    "beginCaptures": {
+                        "1": { "name": "keyword.other.corrozy" },
+                        "2": { "name": "entity.name.function.corrozy" }
+                    },
+                    "end": "\\)",
+                    "patterns": [
+                        { "include": "#types" },
+                        { "include": "#identifiers" },
+                        {
+                            "name": "punctuation.separator.parameter.corrozy",
+                            "match": ","
+                        }
+                    ]
+                }
+            ]
+        },
+        "strings": {
+            "patterns": [
+                {
+                    "name": "string.quoted.double.corrozy",
+                    "begin": "\"",
+                    "end": "\"",
+                    "patterns": [
+                        {
+                            "name": "constant.character.escape.corrozy",
+                            "match": "\\\\."
+                        }
+                    ]
+                }
+            ]
+        },
+        "numbers": {
+            "patterns": [
+                {
+                    "name": "constant.numeric.float.corrozy",
+                    "match": "\\b\\d+\\.\\d+\\b"
+                },
+                {
+                    "name": "constant.numeric.integer.corrozy",
+                    "match": "\\b\\d+\\b"
+                }
+            ]
+        },
+        "operators": {
+            "patterns": [
+                {
+                    "name": "keyword.operator.logical.corrozy",
+                    "match": "(&&|\\|\\||!)"
+                },
+                {
+                    "name": "keyword.operator.comparison.corrozy",
+                    "match": "(==|!=|<=|>=|<|>)"
+                },
+                {
+                    "name": "keyword.operator.arithmetic.corrozy",
+                    "match": "(\\+|\\-|\\*|\\/)"
+                },
+                {
+                    "name": "keyword.operator.assignment.corrozy",
+                    "match": "="
+                },
+                {
+                    "name": "keyword.operator.arrow.corrozy",
+                    "match": "=>"
+                }
+            ]
+        },
+        "identifiers": {
+            "patterns": [
+                {
+                    "name": "variable.other.corrozy",
+                    "match": "\\b[a-zA-Z_][a-zA-Z0-9_]*\\b"
+                }
+            ]
+        }
+    }
+}

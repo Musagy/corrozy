@@ -1,8 +1,8 @@
-int edad = 25;
-float precio = 19.99;
-str nombre = "Juan";
-bool activo = true;
-var cualquier_cosa = "dinámico";
+let edad: int = 25;
+let precio: float = 19.99;
+let nombre: string = "Juan";
+let activo: bool = true;
+let cualquier_cosa = "dinámico";
 
 println(edad);
 println(precio);

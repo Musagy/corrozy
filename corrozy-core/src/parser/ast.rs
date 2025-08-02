@@ -7,9 +7,14 @@ pub enum AstNode {
         expression: Box<Expression>
     },
     VariableDeclaration {
-        var_type: String, 
+        var_type: Option<String>,
         name: String, 
         value: Box<Expression> 
+    },
+    ConstantDeclaration {
+        name: String,
+        const_type: Option<String>,
+        value: Box<Expression>
     },
     PrintStatement { 
         expression: Box<Expression>,
@@ -19,8 +24,23 @@ pub enum AstNode {
         name: String, 
         params: Vec<Parameter>, 
         return_type: Option<String>,
-        body: Vec<AstNode> 
+        body: Block
     },
+    IfStatement {
+        condition: Box<Expression>,
+        then_block: Block,
+        else_clause: Option<Box<ElseClause>>
+    },
+    WhileLoop {
+        condition: Box<Expression>,
+        body: Block
+    },
+    ForLoop {
+        init: Option<Box<ForInit>>,
+        condition: Option<Box<Expression>>,
+        update: Option<Box<Expression>>,
+        body: Block
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -37,12 +57,49 @@ pub enum Expression {
         right: Box<Expression> 
     },
     Parenthesized(Box<Expression>),
+    Closure {
+        params: Vec<Parameter>,
+        return_type: Option<String>,
+        body: Block
+    },
 }
 
 #[derive(Debug, Clone)]
 pub struct Parameter {
-    pub param_type: String,
     pub name: String,
+    pub param_type: Option<String>,
+}
+
+#[derive(Debug, Clone)]
+pub struct ReturnStatement {
+    pub expression: Option<Box<Expression>>,
+}
+
+#[derive(Debug, Clone)]
+pub struct Block {
+    pub statements: Vec<AstNode>,
+    pub return_statement: Option<ReturnStatement>,
+}
+
+impl Block {
+    pub fn new() -> Self {
+        Block {
+            statements: Vec::new(),
+            return_statement: None,
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub enum ElseClause {
+    ElseIf(Box<AstNode>), 
+    Else(Block),
+}
+
+#[derive(Debug, Clone)]
+pub enum ForInit {
+    VariableDeclaration(Box<AstNode>),
+    Expression(Box<Expression>),
 }
 
 #[derive(Debug, Clone)]

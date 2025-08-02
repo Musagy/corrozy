@@ -1,0 +1,23 @@
+{
+    "name": "corrozy-language-support",
+    "displayName": "Corrozy Language Support",
+    "description": "Syntax highlighting for Corrozy language",
+    "version": "0.0.1",
+    "engines": {
+        "vscode": "^1.74.0"
+    },
+    "categories": ["Programming Languages"],
+    "contributes": {
+        "languages": [{
+            "id": "corrozy",
+            "aliases": ["Corrozy", "corrozy"],
+            "extensions": [".crz"],
+            "configuration": "./language-configuration.json"
+        }],
+        "grammars": [{
+            "language": "corrozy",
+            "scopeName": "source.corrozy",
+            "path": "./syntaxes/corrozy.tmGrammar.json"
+        }]
+    }
+}

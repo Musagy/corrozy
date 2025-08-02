@@ -1,6 +1,44 @@
-str name = "diego";
-int age = 23;
+// use App.Variables.Var;
+
+// This is a comment
+let name: string = "diego";
+let age: int = 23;
+
+// type Number = int | float;
+
+// Number is a custom type. Works like a float a integer
+// @var (int | float) $price */
+// let price: Number = 23;
 
 println("Hello");
 println(name);
 println(age);
+
+// This is a function
+// fn hello() {
+//   println("Hello from a function");
+// }
+
+// const a = (): int => {
+//   println("Hello from an arrow function");
+//   return 1;
+// }
+
+// struct Person {
+//   name: string,
+//   age: int
+// }
+
+// fn main() {
+//   hello();
+  // a();
+  
+  // let person: Person = { name: "Diego", age: 23 };
+  // println(person.name);
+  // println(person.age);
+  
+  // Using a variable from another file
+  // Var.printVar();
+// }
+
+// 

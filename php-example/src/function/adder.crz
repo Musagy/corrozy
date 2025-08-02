@@ -1,0 +1,14 @@
+fn autoAdder(): int {
+  let a: int = 5;
+  let b: int = 10;
+  
+  return a + b;
+}
+
+fn adder(
+  a: int,
+  b: int
+): int {
+  let result = a + b;
+  return result;
+}

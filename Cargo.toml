@@ -1,9 +1,18 @@
-[package]
-name = "corrozy"
+[workspace]
+members = [
+    "corrozy-core",
+    "corrozy-cli"
+]
+resolver = "2"
+
+[workspace.package]
 version = "0.0.1"
 edition = "2024"
+authors = ["Musagy diegomusagy@gmail.com"]
+license = "MIT"
+repository = "https://github.com/Musagy/corrozy"
 
-[dependencies]
+[workspace.dependencies]
 clap = { version = "4.0", features = ["derive"] }
 serde = { version = "1.0", features = ["derive"] }
 toml = "0.8"

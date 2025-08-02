@@ -5,8 +5,9 @@ program = { SOI ~ statement* ~ EOI }
 
 statement = {
     variable_declaration
-  | print_statement      // AGREGAR
-  | println_statement    // AGREGAR
+  | constant_declaration
+  | print_statement
+  | println_statement
   | function_declaration
   | expression_statement
   | if_statement
@@ -18,8 +19,16 @@ statement = {
 // * Base grammar for Corrozy language *
 // *************************************
 
+// identifier
+identifier = @{ ASCII_ALPHA ~ (ASCII_ALPHANUMERIC | "_")* }
+
 // Types
-type_annotation = { "int" | "str" | "bool" | "float" | "var" }
+type_annotation = { basic_type | custom_type }
+basic_type = { "int" | "string" | "bool" | "float" | "any" }
+custom_type = @{ ASCII_ALPHA_UPPER ~ (ASCII_ALPHANUMERIC | "_")* }
+
+// define return type 
+define_type = { ":" ~ type_annotation }
 
 // Expressions
 expression = { binary_expression | primary_expression }
@@ -33,6 +42,7 @@ binary_expression = { primary_expression ~ (binary_operator ~ primary_expression
 // Primary expressions
 primary_expression = {
     function_call
+  | closure_expression
   | literal
   | identifier
   | "(" ~ expression ~ ")"
@@ -48,14 +58,18 @@ boolean = { "true" | "false" }
 // Expression statements
 expression_statement = { expression ~ ";" }
 
-
 // ****************************************
 // * Primary grammar for Corrozy language *
 // ****************************************
 
 // Variable declarations
 variable_declaration = {
-    type_annotation ~ identifier ~ "=" ~ expression ~ ";"
+  "let" ~ identifier ~ define_type? ~ "=" ~ expression ~ ";"
+}
+
+// Constant declarations
+constant_declaration = {
+  "const" ~ identifier ~ define_type? ~ "=" ~ expression ~ ";"
 }
 
 // Print statements
@@ -63,26 +77,24 @@ print_statement = { "print" ~ "(" ~ expression ~ ")" ~ ";" }
 println_statement = { "println" ~ "(" ~ expression ~ ")" ~ ";" }
 
 // Parameters
-parameter = { type_annotation ~ identifier }
+parameter = { identifier ~ define_type? }
 parameter_list = { parameter ~ ("," ~ parameter)* }
 
 // Function declarations
 function_declaration = {
-    "fn" ~ identifier ~ "(" ~ parameter_list? ~ ")" ~ return_type? ~ block
+  "fn" ~ identifier ~ "(" ~ parameter_list? ~ ")" ~ define_type? ~ block
 }
 
-// return type 
-return_type = { "->" ~ type_annotation }
-
 // Code block
-block = { "{" ~ statement* ~ "}" }
+block = { "{" ~ statement* ~ return_statement? ~ "}" }
+return_statement = { "return" ~ expression? ~ ";" }
 
 // Function calls
 function_call = { identifier ~ "(" ~ argument_list? ~ ")" }
 argument_list = { expression ~ ("," ~ expression)* }
 
-// identifier
-identifier = @{ ASCII_ALPHA ~ (ASCII_ALPHANUMERIC | "_")* }
+// Closure
+closure_expression = {"(" ~ parameter_list? ~ ")" ~ define_type? ~ "=>" ~ block}
 
 // Valid identifiers
 if_statement = { "if" ~ "(" ~ expression ~ ")" ~ block ~ else_clause? }
@@ -90,5 +102,5 @@ else_clause = { "else" ~ (if_statement | block) }
 
 // Flux control statements
 while_loop = { "while" ~ "(" ~ expression ~ ")" ~ block }
-for_loop = { "for" ~ "(" ~ for_init? ~ ";" ~ expression? ~ ";" ~ expression? ~ ")" ~ block }
-for_init = { variable_declaration | expression }
+for_loop = { "for" ~ "(" ~ for_init ~ expression? ~ ";" ~ expression? ~ ")" ~ block }
+for_init = { variable_declaration | expression_statement }

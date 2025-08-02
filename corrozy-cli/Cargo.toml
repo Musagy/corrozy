@@ -1,0 +1,13 @@
+[package]
+name = "corrozy-cli"
+version.workspace = true
+edition.workspace = true
+
+[[bin]]
+name = "corrozy"
+path = "src/main.rs"
+
+[dependencies]
+corrozy-core = { path = "../corrozy-core" }
+clap.workspace = true
+anyhow.workspace = true

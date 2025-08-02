@@ -1,0 +1,16 @@
+[package]
+name = "corrozy-core"
+version.workspace = true
+edition.workspace = true
+
+[lib]
+name = "corrozy_core"
+
+[dependencies]
+serde.workspace = true
+toml.workspace = true
+pest.workspace = true
+pest_derive.workspace = true
+thiserror.workspace = true
+anyhow.workspace = true
+walkdir.workspace = true

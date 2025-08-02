@@ -2,10 +2,10 @@ use std::path::PathBuf;
 use anyhow::{Ok, Result};
 use clap::Parser;
 
-mod config;
-mod transpiler;
-mod parser;
-mod codegen;
+use corrozy_core::{
+    config,
+    transpiler,
+};
 
 #[derive(Parser)]
 #[command(name = "corrozy")]

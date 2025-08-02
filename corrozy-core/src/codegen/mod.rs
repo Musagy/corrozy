@@ -1,5 +1,4 @@
 pub mod generator;
-pub mod variables;
-pub mod output;
+pub mod syntax;
 
 pub use generator::CodeGenerator;

@@ -1,8 +1,8 @@
-use anyhow::{anyhow, Result};
+use anyhow::{anyhow, Ok, Result};
 use pest::Parser;
 use pest_derive::Parser;
 
-use crate::parser::ast::{AstNode, BinaryOperator, Expression, Literal};
+use crate::parser::ast::{AstNode, BinaryOperator, Block, Expression, Literal, Parameter, ReturnStatement};
 
 #[derive(Parser)]
 #[grammar = "grammar/corrozy.pest"]
@@ -64,7 +64,9 @@ impl CorrozyParserImpl {
                 Rule::for_loop => {
                     return self.parse_for_loop(inner_pair);
                 }
-                _ => {}
+                _ => {
+                    println!("Unknown statement type: {:?}", inner_pair.as_rule());
+                }
             }
         }
         Err(anyhow!("Unknown statement type"))
@@ -153,15 +155,39 @@ impl CorrozyParserImpl {
         Err(anyhow!("Unknown literal type"))
     }
 
+    fn parse_define_type(&mut self, pair: pest::iterators::Pair<Rule>) -> Result<String> {
+        for inner_pair in pair.into_inner() {
+            match inner_pair.as_rule() {
+                Rule::type_annotation => {
+                    return self.parse_type_annotation(inner_pair);
+                }
+                _ => {}
+            }
+        }
+        Err(anyhow!("No type annotation found")) // o tu tipo de error
+    }
+
+    fn parse_type_annotation(&mut self, pair: pest::iterators::Pair<Rule>) -> Result<String> {
+        for inner_pair in pair.into_inner() {
+            match inner_pair.as_rule() {
+                Rule::basic_type | Rule::custom_type => {
+                    return Ok(inner_pair.as_str().to_string());
+                }
+                _ => {}
+            }
+        }
+        Err(anyhow!("Invalid type annotation"))
+    }
+
     fn parse_variable_declaration(&mut self, pair: pest::iterators::Pair<Rule>) -> Result<AstNode> {
-        let mut var_type = String::new();
+        let mut var_type: Option<String> = None;
         let mut name = String::new();
         let mut value = None;
         
         for inner_pair in pair.into_inner() {
             match inner_pair.as_rule() {
-                Rule::type_annotation => {
-                    var_type = inner_pair.as_str().to_string();
+                Rule::define_type => {
+                    var_type = Some(self.parse_define_type(inner_pair)?);
                 }
                 Rule::identifier => {
                     name = inner_pair.as_str().to_string();
@@ -227,11 +253,112 @@ impl CorrozyParserImpl {
         Ok(Expression::FunctionCall { name, args })
     }
     
-    // TODO: Implementar estos métodos en un futuro
-    fn parse_function_declaration(&mut self, _pair: pest::iterators::Pair<Rule>) -> Result<AstNode> {
-        todo!("Function declarations not implemented yet")
+    fn parse_function_declaration(&mut self, pair: pest::iterators::Pair<Rule>) -> Result<AstNode> {
+        let mut return_type: Option<String> = None;
+        let mut name = String::new();
+        let mut params = Vec::new();
+        let mut body: Block = Block::new();
+
+        for inner_pair in pair.into_inner() {
+            match inner_pair.as_rule() {
+                Rule::identifier => {
+                    name = inner_pair.as_str().to_string();
+                }
+                Rule::parameter_list => {
+                    params = self.parse_parameter_list(inner_pair)?;
+                }
+                Rule::define_type => { 
+                    return_type = Some(self.parse_define_type(inner_pair)?);
+                }
+                Rule::block => {
+                    body = self.parse_block(inner_pair)?; 
+                }
+                _ => {}
+            }
+        }
+
+        Ok(AstNode::FunctionDeclaration {
+            name,
+            params,
+            return_type,
+            body:body,
+        })
     }
+    fn parse_parameter_list(&mut self, pair: pest::iterators::Pair<Rule>) -> Result<Vec<Parameter>> {
+        let mut params = Vec::new();
+        
+        for inner_pair in pair.into_inner() {
+            match inner_pair.as_rule() {
+                Rule::parameter => {
+                    params.push(self.parse_parameter(inner_pair)?);
+                }
+                _ => {}
+            }
+        }
+
+        Ok(params)
+    }
+
+    fn parse_parameter(&mut self, pair: pest::iterators::Pair<Rule>) -> Result<Parameter> {
+        let mut name = String::new();
+        let mut param_type = None;
+
+        for inner_pair in pair.into_inner() {
+            match inner_pair.as_rule() {
+                Rule::identifier => {
+                    name = inner_pair.as_str().to_string();
+                }
+                Rule::define_type => {
+                    param_type = Some(self.parse_define_type(inner_pair)?);
+                }
+                _ => {}
+            }
+        }
+
+        Ok(Parameter {
+            name,
+            param_type,
+        })
+    }
+
+    fn parse_block(&mut self, pair: pest::iterators::Pair<Rule>) -> Result<Block> {
+        let mut statements = Vec::new();
+        let mut return_statement = None;
+        
+        for inner_pair in pair.into_inner() {
+            match inner_pair.as_rule() {
+                Rule::statement => {
+                    statements.push(self.parse_statement(inner_pair)?);
+                }
+                Rule::return_statement => {
+                    return_statement = self.parse_return_statement(inner_pair)?;
+                }
+                _ => {
+
+                }
+            }
+        }
+
+        Ok(Block {
+            statements,
+            return_statement,
+        })
+    }
+    fn parse_return_statement(&mut self, pair: pest::iterators::Pair<Rule>) -> Result<Option<ReturnStatement>> {
+        let mut expression = None;
+
+        for inner_pair in pair.into_inner() {
+            match inner_pair.as_rule() {
+                Rule::expression => {
+                    expression = Some(Box::new(self.parse_expression(inner_pair)?));
+                }
+                _ => {}
+            }
+        }
     
+        Ok(Some(ReturnStatement { expression }))
+    }
+
     fn parse_expression_statement(&mut self, pair: pest::iterators::Pair<Rule>) -> Result<AstNode> {
         for inner_pair in pair.into_inner() {
             if inner_pair.as_rule() == Rule::expression {

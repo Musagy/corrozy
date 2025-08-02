@@ -8,12 +8,11 @@ $edad = 25;
 /** @var float $precio */
 $precio = 19.99;
 /** @var string $nombre */
-$nombre = "Juan";
+$nombre = Juan;
 /** @var bool $activo */
 $activo = true;
-/** @var mixed $cualquier_cosa */
-$cualquier_cosa = "dinámico";
-echo $edad . "\n";
-echo $precio . "\n";
-echo $nombre . "\n";
-echo $activo . "\n";
+$cualquier_cosa = dinámico;
+echo "$edad\n";
+echo "$precio\n";
+echo "$nombre\n";
+echo "$activo\n";
