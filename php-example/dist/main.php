@@ -13,3 +13,4 @@ echo "$age\n";
 function hello() {
     echo "Hello from a function\n";
 }
+hello();

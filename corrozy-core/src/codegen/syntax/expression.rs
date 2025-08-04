@@ -12,9 +12,7 @@ impl ExpressionGen {
     pub fn generate(&self, expr: &Expression) -> Result<String> {
         match expr {
             Expression::Literal(lit) => {
-                let raw = lit.to_php();
-                // let trimmed = raw.trim_matches('"').to_string();
-                Ok(raw)
+                Ok(lit.to_php())
             }
             Expression::Variable(name) => {
                 Ok(format!("${}", name))

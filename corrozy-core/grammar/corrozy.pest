@@ -9,10 +9,10 @@ statement = {
   | print_statement
   | println_statement
   | function_declaration
-  | expression_statement
   | if_statement
   | while_loop
   | for_loop
+  | expression_statement
 }
 
 // *************************************

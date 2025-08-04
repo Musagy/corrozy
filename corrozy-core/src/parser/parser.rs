@@ -97,7 +97,7 @@ impl CorrozyParserImpl {
                     return Ok(Expression::Variable(inner_pair.as_str().to_string()));
                 }
                 Rule::function_call => {
-                    return self.parse_function_call(inner_pair);
+                    return Ok(self.parse_fn_call(inner_pair)?);
                 }
                 Rule::expression => {
                     return Ok(Expression::Parenthesized(Box::new(self.parse_expression(inner_pair)?)));
@@ -230,7 +230,7 @@ impl CorrozyParserImpl {
         Err(anyhow!("Invalid println statement"))
     }
 
-    fn parse_function_call(&mut self, pair: pest::iterators::Pair<Rule>) -> Result<Expression> {
+    fn parse_fn_call(&mut self, pair: pest::iterators::Pair<Rule>) -> Result<Expression> {
         let mut name = String::new();
         let mut args = Vec::new();
         
@@ -284,6 +284,7 @@ impl CorrozyParserImpl {
             body:body,
         })
     }
+    
     fn parse_parameter_list(&mut self, pair: pest::iterators::Pair<Rule>) -> Result<Vec<Parameter>> {
         let mut params = Vec::new();
         
@@ -344,6 +345,7 @@ impl CorrozyParserImpl {
             return_statement,
         })
     }
+    
     fn parse_return_statement(&mut self, pair: pest::iterators::Pair<Rule>) -> Result<Option<ReturnStatement>> {
         let mut expression = None;
 

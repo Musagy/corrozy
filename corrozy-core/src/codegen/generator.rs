@@ -1,22 +1,24 @@
 use anyhow::{Ok, Result};
 
-use crate::{codegen::syntax::{function::FunctionGenerator, output::OutputGenerator, variables::VariableGenerator}, config::Config, parser::ast::AstNode};
+use crate::{codegen::syntax::{exp_statement::ExpStatementGenerator, function::FunctionGenerator, output::OutputGenerator, variables::VariableGenerator}, config::Config, parser::ast::AstNode};
 
 
 pub struct CodeGenerator<'a> {
-    config: &'a Config,
+    // config: &'a Config,
     variable_gen: VariableGenerator<'a>,
     output_gen: OutputGenerator,
     function_gen: FunctionGenerator<'a>,
+    exp_statement_gen: ExpStatementGenerator,
 }
 
 impl<'a> CodeGenerator<'a> {
     pub fn new(config: &'a Config) -> Self {
         Self {
-            config,
+            // config,
             variable_gen: VariableGenerator::new(config),
             output_gen: OutputGenerator::new(),
             function_gen: FunctionGenerator::new(config),
+            exp_statement_gen: ExpStatementGenerator::new(),
         }
     }
 
@@ -48,8 +50,8 @@ impl<'a> CodeGenerator<'a> {
                 self.output_gen.generate(expression, *newline)
             }
             
-            AstNode::ExpressionStatement { .. } => {
-                Ok(String::new())
+            AstNode::ExpressionStatement { expression } => {
+                self.exp_statement_gen.generate(expression)
             }
 
             AstNode::FunctionDeclaration {
@@ -75,3 +77,5 @@ impl<'a> CodeGenerator<'a> {
     }
     
 }
+
+
