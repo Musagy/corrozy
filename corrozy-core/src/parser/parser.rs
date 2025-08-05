@@ -40,14 +40,11 @@ impl CorrozyParserImpl {
     fn parse_statement(&mut self, pair: pest::iterators::Pair<Rule>) -> Result<AstNode> {
         for inner_pair in pair.into_inner() {
             match inner_pair.as_rule() {
-                Rule::variable_declaration => {
-                    return self.parse_variable_declaration(inner_pair);
+                Rule::variable_declaration | Rule::constant_declaration => {
+                    return self.parse_declaration_declaration(inner_pair);
                 }
-                Rule::print_statement => {
-                    return self.parse_print_statement(inner_pair);
-                }
-                Rule::println_statement => {
-                    return self.parse_println_statement(inner_pair);
+                Rule::print_statement | Rule::println_statement => {
+                    return self.parse_output_statement(inner_pair);
                 }
                 Rule::function_declaration => {
                     return self.parse_function_declaration(inner_pair);
@@ -179,7 +176,8 @@ impl CorrozyParserImpl {
         Err(anyhow!("Invalid type annotation"))
     }
 
-    fn parse_variable_declaration(&mut self, pair: pest::iterators::Pair<Rule>) -> Result<AstNode> {
+    fn parse_declaration_declaration(&mut self, pair: pest::iterators::Pair<Rule>) -> Result<AstNode> {
+        let is_constant = pair.as_rule() == Rule::constant_declaration;
         let mut var_type: Option<String> = None;
         let mut name = String::new();
         let mut value = None;
@@ -199,35 +197,27 @@ impl CorrozyParserImpl {
             }
         }
         
-        Ok(AstNode::VariableDeclaration {
-            var_type,
-            name,
-            value: value.ok_or_else(|| anyhow!("Variable declaration missing value"))?,
-        })
+        let val = value.ok_or_else(|| anyhow!("Declaration missing value"))?;
+        
+        if is_constant {
+            Ok(AstNode::ConstantDeclaration { name, const_type: var_type, value: val })
+        } else {
+            Ok(AstNode::VariableDeclaration { var_type, name, value: val })
+        }
     }
 
-    fn parse_print_statement(&mut self, pair: pest::iterators::Pair<Rule>) -> Result<AstNode> {
+    fn parse_output_statement(&mut self, pair: pest::iterators::Pair<Rule>) -> Result<AstNode> {
+        let is_println = pair.as_rule() == Rule::println_statement;
+        
         for inner_pair in pair.into_inner() {
             if inner_pair.as_rule() == Rule::expression {
                 return Ok(AstNode::PrintStatement {
                     expression: Box::new(self.parse_expression(inner_pair)?),
-                    newline: false,
+                    newline: is_println,
                 });
             }
         }
-        Err(anyhow!("Invalid print statement"))
-    }
-    
-    fn parse_println_statement(&mut self, pair: pest::iterators::Pair<Rule>) -> Result<AstNode> {
-        for inner_pair in pair.into_inner() {
-            if inner_pair.as_rule() == Rule::expression {
-                return Ok(AstNode::PrintStatement {
-                    expression: Box::new(self.parse_expression(inner_pair)?),
-                    newline: true,
-                });
-            }
-        }
-        Err(anyhow!("Invalid println statement"))
+        Err(anyhow!("Invalid output statement"))
     }
 
     fn parse_fn_call(&mut self, pair: pest::iterators::Pair<Rule>) -> Result<Expression> {

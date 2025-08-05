@@ -1,4 +1,4 @@
-pub mod variables;
+pub mod declaration;
 pub mod output;
 pub mod function;
 pub mod expression;

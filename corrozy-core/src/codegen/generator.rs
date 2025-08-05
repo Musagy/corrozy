@@ -1,11 +1,11 @@
 use anyhow::{Ok, Result};
 
-use crate::{codegen::syntax::{exp_statement::ExpStatementGenerator, function::FunctionGenerator, output::OutputGenerator, variables::VariableGenerator}, config::Config, parser::ast::AstNode};
+use crate::{codegen::syntax::{declaration::{DeclarationGenerator}, exp_statement::ExpStatementGenerator, function::FunctionGenerator, output::OutputGenerator}, config::Config, parser::ast::AstNode};
 
 
 pub struct CodeGenerator<'a> {
     // config: &'a Config,
-    variable_gen: VariableGenerator<'a>,
+    declaration_gen : DeclarationGenerator<'a>,
     output_gen: OutputGenerator,
     function_gen: FunctionGenerator<'a>,
     exp_statement_gen: ExpStatementGenerator,
@@ -15,7 +15,7 @@ impl<'a> CodeGenerator<'a> {
     pub fn new(config: &'a Config) -> Self {
         Self {
             // config,
-            variable_gen: VariableGenerator::new(config),
+            declaration_gen: DeclarationGenerator::new(config),
             output_gen: OutputGenerator::new(),
             function_gen: FunctionGenerator::new(config),
             exp_statement_gen: ExpStatementGenerator::new(),
@@ -43,7 +43,11 @@ impl<'a> CodeGenerator<'a> {
             }
 
             AstNode::VariableDeclaration { var_type, name, value } => {
-                self.variable_gen.generate(var_type, name, value)
+                self.declaration_gen.generate(var_type, name, value, false)
+            }
+            
+            AstNode::ConstantDeclaration { const_type, name, value } => {
+                self.declaration_gen.generate(const_type, name, value, true)
             }
             
             AstNode::PrintStatement { expression, newline } => {

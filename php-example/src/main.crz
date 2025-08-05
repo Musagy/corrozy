@@ -3,6 +3,7 @@
 // This is a comment
 let name: string = "diego";
 let age: int = 23;
+const PI: float = 3.14;
 
 // type Number = int | float;
 

@@ -7,6 +7,8 @@ namespace MyApp;
 $name = "diego";
 /** @var int $age */
 $age = 23;
+/** @var float */
+const PI = 3.14;
 echo "Hello\n";
 echo "$name\n";
 echo "$age\n";
