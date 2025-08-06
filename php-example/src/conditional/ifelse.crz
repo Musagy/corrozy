@@ -1,0 +1,9 @@
+let rand_num = random_int(1, 3);
+
+if rand_num == 1 {
+    println("Condition is true");
+} else if rand_num == 2 {
+    println("Condition is false");
+} else {
+    println("Condition is neither true nor false");
+}

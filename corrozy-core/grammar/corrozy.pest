@@ -97,7 +97,7 @@ argument_list = { expression ~ ("," ~ expression)* }
 closure_expression = {"(" ~ parameter_list? ~ ")" ~ define_type? ~ "=>" ~ block}
 
 // Valid identifiers
-if_statement = { "if" ~ "(" ~ expression ~ ")" ~ block ~ else_clause? }
+if_statement = { "if" ~ expression ~ block ~ else_clause? }
 else_clause = { "else" ~ (if_statement | block) }
 
 // Flux control statements

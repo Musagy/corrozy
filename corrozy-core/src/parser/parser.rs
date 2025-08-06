@@ -2,7 +2,7 @@ use anyhow::{anyhow, Ok, Result};
 use pest::Parser;
 use pest_derive::Parser;
 
-use crate::parser::ast::{AstNode, BinaryOperator, Block, Expression, Literal, Parameter, ReturnStatement};
+use crate::parser::ast::{AstNode, BinaryOperator, Block, ElseClause, Expression, Literal, Parameter, ReturnStatement};
 
 #[derive(Parser)]
 #[grammar = "grammar/corrozy.pest"]
@@ -362,8 +362,50 @@ impl CorrozyParserImpl {
         Err(anyhow!("Invalid expression statement"))
     }
     
-    fn parse_if_statement(&mut self, _pair: pest::iterators::Pair<Rule>) -> Result<AstNode> {
-        todo!("If statements not implemented yet")
+    fn parse_if_statement(&mut self, pair: pest::iterators::Pair<Rule>) -> Result<AstNode> {
+        let mut condition: Option<Box<Expression>> = None;
+        let mut then_block: Option<Block> = None;
+        let mut else_clause: Option<Box<ElseClause>> = None;
+        
+        for inner_pair in pair.into_inner() {
+            match inner_pair.as_rule() {
+                Rule::expression => {
+                    condition = Some(Box::new(self.parse_expression(inner_pair)?));
+                }
+                Rule::block => {
+                    if then_block.is_none() {
+                        then_block = Some(self.parse_block(inner_pair)?);
+                    }
+                }
+                Rule::else_clause => {
+                    else_clause = Some(Box::new(self.parse_else_clause(inner_pair)?));
+                }
+                _ => {}
+            }
+        }
+        
+        // Estos DEBEN existir por gramática, pero por seguridad verificamos
+        Ok(AstNode::IfStatement {
+            condition: condition.expect("Grammar guarantees condition exists"),
+            then_block: then_block.expect("Grammar guarantees then_block exists"),
+            else_clause,
+        })
+    }
+
+    fn parse_else_clause(&mut self, pair: pest::iterators::Pair<Rule>) -> Result<ElseClause> {
+        for inner_pair in pair.into_inner() {
+            match inner_pair.as_rule() {
+                Rule::if_statement => {
+                    let if_node = self.parse_if_statement(inner_pair)?;
+                    return Ok(ElseClause::ElseIf(Box::new(if_node)));
+                }
+                Rule::block => {
+                    return Ok(ElseClause::Else(self.parse_block(inner_pair)?));
+                }
+                _ => {}
+            }
+        }
+        Err(anyhow!("Empty else clause"))
     }
     
     fn parse_while_loop(&mut self, _pair: pest::iterators::Pair<Rule>) -> Result<AstNode> {
