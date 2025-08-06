@@ -64,7 +64,7 @@ $result = add(5, 3);
 ### 🔀 Control Flow (Next)
 **Corrozy:**
 ```rust
-if (user.isActive) {
+if user.isActive {
     println("User is active");
 } else {
     println("User is inactive");
@@ -81,7 +81,7 @@ if ($user->isActive) {
 
 ---
 
-## 📋 PLANNED
+## 🚧 IN PROGRESS
 
 ### 🔄 Loops
 **Corrozy:**
@@ -94,6 +94,10 @@ for (let i = 0; i < 10; i++) {
     println("Number: {}", i);
 }
 ```
+
+---
+
+## 📋 PLANNED
 
 ### 📚 Arrays
 **Corrozy:**
