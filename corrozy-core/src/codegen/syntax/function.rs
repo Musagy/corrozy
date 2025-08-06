@@ -1,3 +1,5 @@
+use std::rc::Rc;
+
 use anyhow::Result;
 
 use crate::{codegen::syntax::block::BlockGenerator, parser::ast::{AstNode, Block, Parameter}, Config};
@@ -21,7 +23,7 @@ impl<'a> FunctionGenerator<'a> {
         params: &[Parameter],
         return_type: &Option<String>,
         body: &Block,
-        node_generator: F,
+        node_generator: Rc<F>,
     ) -> Result<String>
     where
         F: Fn(&AstNode) -> Result<String>,

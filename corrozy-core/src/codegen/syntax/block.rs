@@ -1,3 +1,5 @@
+use std::rc::Rc;
+
 use anyhow::Result;
 
 use crate::{codegen::syntax::expression::ExpressionGen, parser::ast::{AstNode, Block}};
@@ -14,7 +16,7 @@ impl BlockGenerator {
         }
     }
 
-    pub fn generate<F>(&self, block: &Block, node_generator: F) -> Result<String>
+    pub fn generate<F>(&self, block: &Block, node_generator: Rc<F>) -> Result<String>
     where
         F: Fn(&AstNode) -> Result<String>,
     {

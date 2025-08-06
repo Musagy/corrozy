@@ -1,6 +1,8 @@
+use std::rc::Rc;
+
 use anyhow::{Ok, Result};
 
-use crate::{codegen::syntax::{declaration::{DeclarationGenerator}, exp_statement::ExpStatementGenerator, function::FunctionGenerator, output::OutputGenerator}, config::Config, parser::ast::AstNode};
+use crate::{codegen::syntax::{declaration::DeclarationGenerator, exp_statement::ExpStatementGenerator, function::FunctionGenerator, if_else::{IfElseGenerator}, output::OutputGenerator}, config::Config, parser::ast::AstNode};
 
 
 pub struct CodeGenerator<'a> {
@@ -9,6 +11,7 @@ pub struct CodeGenerator<'a> {
     output_gen: OutputGenerator,
     function_gen: FunctionGenerator<'a>,
     exp_statement_gen: ExpStatementGenerator,
+    if_else_gen: IfElseGenerator
 }
 
 impl<'a> CodeGenerator<'a> {
@@ -19,6 +22,7 @@ impl<'a> CodeGenerator<'a> {
             output_gen: OutputGenerator::new(),
             function_gen: FunctionGenerator::new(config),
             exp_statement_gen: ExpStatementGenerator::new(),
+            if_else_gen: IfElseGenerator::new(),
         }
     }
 
@@ -31,8 +35,9 @@ impl<'a> CodeGenerator<'a> {
         
         Ok(output)
     }
-
+    
     fn generate_node(&self, node: &AstNode) -> Result<String> {
+        let generator = Rc::new(|node: &AstNode| self.generate_node(node));
         match node {
             AstNode::Program { statements } => {
                 let mut result = String::new();
@@ -69,7 +74,17 @@ impl<'a> CodeGenerator<'a> {
                     params,
                     return_type,
                     body,
-                    |node| self.generate_node(node) // Closure que captura self
+                    generator
+                )
+            }
+
+            AstNode::IfStatement { condition, then_block, else_clause } => {
+
+                self.if_else_gen.generate(
+                    condition,
+                    then_block,
+                    else_clause,
+                    generator
                 )
             }
 
