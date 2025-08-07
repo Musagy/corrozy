@@ -1,0 +1,12 @@
+[package]
+name = "tests"
+version.workspace = true
+edition.workspace = true
+
+[[test]]
+name = "integration_test"
+path = "./integration_test.rs"
+
+[dev-dependencies]
+corrozy-core = { path = "../corrozy-core" }
+anyhow = "1.0"
