@@ -1,7 +1,8 @@
 [workspace]
 members = [
     "corrozy-core",
-    "corrozy-cli"
+    "corrozy-cli",
+    "tests"
 ]
 resolver = "2"
 

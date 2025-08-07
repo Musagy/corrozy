@@ -1,1 +1,2 @@
-mod variable;
+pub mod variable;
+pub mod function;
