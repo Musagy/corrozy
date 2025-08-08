@@ -59,8 +59,6 @@ $result = add(5, 3);
 
 ---
 
-## 🚧 IN PROGRESS
-
 ### 🔀 Control Flow (Next)
 **Corrozy:**
 ```rust
