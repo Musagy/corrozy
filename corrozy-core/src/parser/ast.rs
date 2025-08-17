@@ -161,10 +161,16 @@ impl BinaryOperator {
 }
 
 #[derive(Debug, Clone)]
+pub enum StringType {
+    Interpolated(String),  // Para "content"
+    Raw(String),          // Para 'content'
+}
+
+#[derive(Debug, Clone)]
 pub enum Literal {
     Integer(i64),
     Float(f64),
-    String(String),
+    String(StringType),
     Boolean(bool),
 }
 
@@ -173,8 +179,17 @@ impl Literal {
         match self {
             Self::Integer(n) => n.to_string(),
             Self::Float(f) => f.to_string(),
-            Self::String(s) => format!("\"{}\"", s),
+            Self::String(s) => s.to_php(),
             Self::Boolean(b) => (if *b { "true" } else { "false" }).to_string(),
+        }
+    }
+}
+
+impl StringType {
+    pub fn to_php(&self) -> String {
+        match self {
+            Self::Interpolated(content) => format!("\"{}\"", content),
+            Self::Raw(content) => format!("'{}'", content),
         }
     }
 }

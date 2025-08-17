@@ -13,19 +13,12 @@ impl OutputGenerator {
     }
     
     pub fn generate(&self, expression: &Expression, newline: bool) -> Result<String> {
-        let php_expr = match expression {
-            Expression::Literal(Literal::String(s)) => {
-                s.as_str() // Convierte &String a &str
-            },
-            _ => {
-                &self.expression_gen.generate(expression)?
-            }
-        };
+        let php_expr = self.expression_gen.generate(expression)?;
 
         if newline {
-            Ok(format!("echo \"{}\\n\";\n", php_expr))
+            Ok(format!("echo {} . \"\\n\";\n", php_expr))
         } else {
-            Ok(format!("echo \"{}\";\n", php_expr))
+            Ok(format!("echo {};\n", php_expr))
         }
     }
 }

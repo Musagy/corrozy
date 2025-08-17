@@ -2,7 +2,7 @@ use anyhow::{anyhow, Ok, Result};
 use pest::Parser;
 use pest_derive::Parser;
 
-use crate::parser::ast::{AstNode, BinaryOperator, Block, ElseClause, Expression, Literal, Parameter, ReturnStatement};
+use crate::parser::ast::{AstNode, BinaryOperator, Block, ElseClause, Expression, Literal, Parameter, ReturnStatement, StringType};
 
 #[derive(Parser)]
 #[grammar = "grammar/corrozy.pest"]
@@ -129,10 +129,7 @@ impl CorrozyParserImpl {
         for inner_pair in pair.into_inner() {
             match inner_pair.as_rule() {
                 Rule::string => {
-                    let mut value = inner_pair.as_str().to_string();
-                    value.remove(0);
-                    value.pop();
-                    return Ok(Literal::String(value));
+                    return self.parse_string_literal(inner_pair);
                 }
                 Rule::integer => {
                     let value = inner_pair.as_str().parse::<i64>()?;
@@ -150,6 +147,27 @@ impl CorrozyParserImpl {
             }
         }
         Err(anyhow!("Unknown literal type"))
+    }
+
+    fn parse_string_literal(&mut self, pair: pest::iterators::Pair<Rule>) -> Result<Literal> {
+        for inner_pair in pair.into_inner() {
+            match inner_pair.as_rule() {
+                Rule::interpolated_string => {
+                    let mut value = inner_pair.as_str().to_string();
+                    value.remove(0); // Quita "
+                    value.pop();     // Quita "
+                    return Ok(Literal::String(StringType::Interpolated(value)));
+                }
+                Rule::raw_string => {
+                    let mut value = inner_pair.as_str().to_string();
+                    value.remove(0); // Quita '
+                    value.pop();     // Quita '
+                    return Ok(Literal::String(StringType::Raw(value)));
+                }
+                _ => {}
+            }
+        }
+        Err(anyhow!("Unknown string type"))
     }
 
     fn parse_define_type(&mut self, pair: pest::iterators::Pair<Rule>) -> Result<String> {
