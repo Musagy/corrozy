@@ -52,8 +52,10 @@ primary_expression = {
 literal = { float | integer | string | boolean }
 integer = @{ ASCII_DIGIT+ }
 float = @{ ASCII_DIGIT+ ~ "." ~ ASCII_DIGIT+ }
-string = @{ "\"" ~ (!"\"" ~ ANY)* ~ "\"" }
 boolean = { "true" | "false" }
+string = { interpolated_string | raw_string }
+interpolated_string = @{ "\"" ~ (!"\"" ~ ANY)* ~ "\"" }
+raw_string = @{ "'" ~ (!"'" ~ ANY)* ~ "'" }
 
 // Expression statements
 expression_statement = { expression ~ ";" }

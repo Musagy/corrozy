@@ -9,10 +9,13 @@ $name = "diego";
 $age = 23;
 /** @var float */
 const PI = 3.14;
-echo "Hello\n";
-echo "$name\n";
-echo "$age\n";
+echo "Hello" . "\n";
+echo $name . "\n";
+echo $age . "\n";
 function hello() {
-    echo "Hello from a function\n";
+    echo "Hello from a function" . "\n";
 }
-hello();
+hello();function main() {
+    hello();
+    a();
+}

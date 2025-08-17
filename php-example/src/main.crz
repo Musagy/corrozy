@@ -35,12 +35,12 @@ fn main() {
   hello();
   a();
   
-  let person: Person = { name: "Diego", age: 23 };
-  println(person.name);
-  println(person.age);
+  // let person: Person = { name: "Diego", age: 23 };
+  // println(person.name);
+  // println(person.age);
   
-  Using a variable from another file
-  Var.printVar();
+  // Using a variable from another file
+  // Var.printVar();
 }
 
 // 
