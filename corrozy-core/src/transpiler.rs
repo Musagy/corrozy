@@ -37,15 +37,12 @@ impl Transpiler {
     }
 
     /// Transpile a single file from Corrozy to PHP
-    fn transpile_file<F>(
+    fn transpile_file(
         &self,
         input_path: &Path,
         output_dir: &Path,
         project_path: &Path
-    ) -> Result<()> 
-    where 
-        F: Fn(&AstNode) -> Result<String>
-    {
+    ) -> Result<()> {
         let content = std::fs::read_to_string(input_path)?;
         
         let mut parser = CorrozyParserImpl::new();
@@ -69,7 +66,7 @@ impl Transpiler {
             relative_path
         };
 
-        let php_code = self.generate_php::<F>(output_relative_path, &ast)?;
+        let php_code = self.generate_php(output_relative_path, &ast)?;
         
         let output_file_path = output_dir.join(output_relative_path).with_extension("php");
         

@@ -13,8 +13,7 @@ impl ExpStatementGenerator {
         }
     }
 
-    pub fn generate<F>(&self, expression: &Expression, name: Option<&str>
-    ) -> Result<String>
+    pub fn generate<F>(&self, expression: &Expression) -> Result<String>
     where
         F: Fn(&AstNode) -> Result<String> + ?Sized,
     {

@@ -77,7 +77,7 @@ impl CodeGenerator {
             }
             
             AstNode::ExpressionStatement { expression } => {
-                self.exp_statement_gen.generate::<F>(expression, None)
+                self.exp_statement_gen.generate::<F>(expression)
             }
 
             AstNode::FunctionDeclaration {

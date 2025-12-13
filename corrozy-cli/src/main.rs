@@ -3,8 +3,7 @@ use anyhow::{Ok, Result};
 use clap::Parser;
 
 use corrozy_core::{
-    config,
-    transpiler,
+    config, parser::ast::AstNode, transpiler
 };
 
 #[derive(Parser)]
