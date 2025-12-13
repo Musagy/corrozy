@@ -5,3 +5,4 @@ pub mod expression;
 pub mod block;
 pub mod exp_statement;
 pub mod if_else;
+pub mod closure;

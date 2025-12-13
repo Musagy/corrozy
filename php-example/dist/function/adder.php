@@ -19,6 +19,18 @@ function autoAdder() {
  * @return int
  */
 function adder($a, $b) {
-    $result = $a + $b;
-    return $result;
+    /** @var int $int1 */
+    $int1 = $a;
+    /** @var int $int2 */
+    $int2 = $b;
+    /**
+     * @return int
+     */
+    function idk() use ($int1, $int2) {
+        $result = $int1 + $int2;
+        return $result * 2;
+    }
+    return idk();
 }
+
+echo adder(5, 10);

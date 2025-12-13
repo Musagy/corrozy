@@ -2,15 +2,15 @@ use std::rc::Rc;
 
 use anyhow::Result;
 
-use crate::{codegen::syntax::block::BlockGenerator, parser::ast::{AstNode, Block, Parameter}, Config};
+use crate::{codegen::syntax::{block::BlockGenerator, expression::ExpressionGen}, parser::ast::{AstNode, Block, Parameter}, Config};
 
-pub struct FunctionGenerator<'a> {
-    config: &'a Config,
+pub struct FunctionGenerator {
+    config: Rc<Config>,
     block_gen: BlockGenerator,
 }
 
-impl<'a> FunctionGenerator<'a> {
-    pub fn new(config: &'a Config) -> Self {
+impl FunctionGenerator {
+    pub fn new(config: Rc<Config>) -> Self {
         Self {
             config,
             block_gen: BlockGenerator::new(),
@@ -23,6 +23,7 @@ impl<'a> FunctionGenerator<'a> {
         params: &[Parameter],
         return_type: &Option<String>,
         body: &Block,
+        expression_gen: &ExpressionGen,
         node_generator: Rc<F>,
     ) -> Result<String>
     where
@@ -38,17 +39,46 @@ impl<'a> FunctionGenerator<'a> {
         let php_params: Vec<String> = params.iter().map(|param| {
             format!("${}", param.name)
         }).collect();
-        result.push_str(&php_params.join(", "));        
+        result.push_str(&php_params.join(", "));
         result.push_str(") {\n");
 
         // result.push_str(&self.generate_body(body)?);
 
-        result.push_str(&self.block_gen.generate(body, node_generator)?);
+        result.push_str(&self.block_gen.generate(body, expression_gen, node_generator)?);
 
         result.push_str("}\n");
 
         return Ok(result);
     }
+    
+    pub fn generate_fn_headless<F>(
+        &self,
+        params: &[Parameter],
+        body: &Block,
+        expression_gen: &ExpressionGen,
+        node_generator: Rc<F>,
+    ) -> Result<String>
+    where
+        F: Fn(&AstNode) -> Result<String> + ?Sized,
+    {
+        let mut result = String::new();
+
+        // params
+        result.push_str(&format!("("));
+        let php_params: Vec<String> = params.iter().map(|param| {
+            format!("${}", param.name)
+        }).collect();
+        result.push_str(&php_params.join(", "));
+        result.push_str(") {\n");
+
+        // body
+        result.push_str(&self.block_gen.generate(body, expression_gen, node_generator)?);
+        result.push_str("}\n");
+
+        return Ok(result);
+    }
+
+
     fn generate_doc (
         &self,
         params: &[Parameter], 

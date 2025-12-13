@@ -49,6 +49,36 @@ mod variable_declaration_tests {
             other => panic!("Expected VariableDeclaration, got: {:?}", other),
         }
     }
+
+    #[test]
+    /// Test variable declaration with special characters in name
+    fn test_variable_declaration_special_names() {
+        let ast = parse_single_statement("let _variable_name = 42;");
+        
+        match ast {
+            AstNode::VariableDeclaration { name, var_type, value } => {
+                assert_eq!(name, "_variable_name");
+                assert!(var_type.is_none());
+                assert_eq!(extract_literal_value(&value), "42");
+            },
+            other => panic!("Expected VariableDeclaration, got: {:?}", other),
+        }
+    }
+
+    #[test]
+    /// Test variable declaration with empty string
+    fn test_variable_declaration_empty_string() {
+        let ast = parse_single_statement("let empty = \"\";");
+        
+        match ast {
+            AstNode::VariableDeclaration { name, var_type, value } => {
+                assert_eq!(name, "empty");
+                assert!(var_type.is_none());
+                assert_eq!(extract_literal_value(&value), "\"\"");
+            },
+            other => panic!("Expected VariableDeclaration, got: {:?}", other),
+        }
+    }
 }
 
 #[cfg(test)]
@@ -84,6 +114,21 @@ mod constant_declaration_tests {
             other => panic!("Expected ConstantDeclaration, got: {:?}", other),
         }
     }
+
+    #[test]
+    /// Test constant declaration with large numbers
+    fn test_constant_declaration_large_numbers() {
+        let ast = parse_single_statement("const BIG_NUMBER = 9999999999;");
+        
+        match ast {
+            AstNode::ConstantDeclaration { name, const_type, value } => {
+                assert_eq!(name, "BIG_NUMBER");
+                assert!(const_type.is_none());
+                assert_eq!(extract_literal_value(&value), "9999999999");
+            },
+            other => panic!("Expected ConstantDeclaration, got: {:?}", other),
+        }
+    }
 }
 
 #[cfg(test)]
@@ -115,38 +160,55 @@ mod literal_generation_tests {
     }
 
     #[test]
-    /// Test interpolated string (double quotes) generation
+    /// Test interpolated string generation with comprehensive cases
     fn test_interpolated_string_generation() {
+        // Basic interpolated string
         let literal = Literal::String(StringType::Interpolated("Hello world".to_string()));
         assert_eq!(literal.to_php(), "\"Hello world\"");
+        
+        // With PHP variables
+        let literal_vars = Literal::String(StringType::Interpolated("Hello $name, price: $price".to_string()));
+        assert_eq!(literal_vars.to_php(), "\"Hello $name, price: $price\"");
+        
+        // Empty string
+        let empty_literal = Literal::String(StringType::Interpolated("".to_string()));
+        assert_eq!(empty_literal.to_php(), "\"\"");
     }
 
     #[test]
-    /// Test raw string (single quotes) generation
+    /// Test raw string generation with comprehensive cases
     fn test_raw_string_generation() {
+        // Basic raw string
         let literal = Literal::String(StringType::Raw("Hello world".to_string()));
         assert_eq!(literal.to_php(), "'Hello world'");
+        
+        // Raw string with PHP variables (no interpolation)
+        let literal_vars = Literal::String(StringType::Raw("Hello $name".to_string()));
+        assert_eq!(literal_vars.to_php(), "'Hello $name'");
+        
+        // Empty raw string
+        let empty_literal = Literal::String(StringType::Raw("".to_string()));
+        assert_eq!(empty_literal.to_php(), "''");
     }
 
     #[test]
-    /// Test interpolated string with PHP variables
-    fn test_interpolated_string_with_variables() {
-        let literal = Literal::String(StringType::Interpolated("Hello $name".to_string()));
-        assert_eq!(literal.to_php(), "\"Hello $name\"");
+    /// Test strings with escape characters
+    fn test_string_with_escapes() {
+        let literal = Literal::String(StringType::Interpolated("Hello\\nWorld\\t".to_string()));
+        assert_eq!(literal.to_php(), "\"Hello\\nWorld\\t\"");
+        
+        let raw_literal = Literal::String(StringType::Raw("Path: C:\\\\Users\\\\Name".to_string()));
+        assert_eq!(raw_literal.to_php(), "'Path: C:\\\\Users\\\\Name'");
     }
 
     #[test]
-    /// Test raw string with PHP variables (no interpolation)
-    fn test_raw_string_with_variables() {
-        let literal = Literal::String(StringType::Raw("Hello $name".to_string()));
-        assert_eq!(literal.to_php(), "'Hello $name'");
-    }
-
-    #[test]
-    /// Test interpolated string with mixed content
-    fn test_interpolated_string_mixed_content() {
-        let literal = Literal::String(StringType::Interpolated("Price: $price for item".to_string()));
-        assert_eq!(literal.to_php(), "\"Price: $price for item\"");
+    /// Test extreme numeric values
+    fn test_extreme_numeric_literals() {
+        let large_int = Literal::Integer(i64::MAX);
+        assert_eq!(large_int.to_php(), &*i64::MAX.to_string());
+        
+        let small_float = Literal::Float(0.00001);
+        assert_eq!(small_float.to_php(), "0.00001");
     }
 }
 
@@ -155,24 +217,24 @@ mod syntax_error_tests {
     use super::*;
 
     #[test]
-    #[should_panic]
     /// Test that missing semicolon causes parser error
     fn test_missing_semicolon() {
-        parse_single_statement("let x = 1");
+        let result = parse_with_error("let x = 1");
+        assert!(result.is_err());
     }
 
     #[test]
-    #[should_panic]
     /// Test that missing assignment in variable declaration causes parser error
     fn test_missing_variable_assignment() {
-        parse_single_statement("let x;");
+        let result = parse_with_error("let x;");
+        assert!(result.is_err());
     }
 
     #[test]
-    #[should_panic]
     /// Test that invalid type annotation causes parser error
     fn test_invalid_type() {
-        parse_single_statement("let x: invalide = 1;");
+        let result = parse_with_error("let x: invalide = 1;");
+        assert!(result.is_err());
     }
 
     #[test]
@@ -186,6 +248,13 @@ mod syntax_error_tests {
         
         let result = parse_with_error("let x = ;");
         assert!(result.is_err());
+        
+        // Invalid variable names
+        let result = parse_with_error("let 123invalid = 5;");
+        assert!(result.is_err());
+        
+        let result = parse_with_error("let var-name = 5;");
+        assert!(result.is_err());
     }
 
     #[test]
@@ -195,6 +264,20 @@ mod syntax_error_tests {
         assert!(result.is_err());
         
         let result = parse_with_error("const X;");
+        assert!(result.is_err());
+        
+        // Invalid constant names
+        let result = parse_with_error("const 123INVALID = 5;");
+        assert!(result.is_err());
+    }
+
+    #[test]
+    /// Test malformed string literals
+    fn test_malformed_strings() {
+        let result = parse_with_error("let x = \"unterminated string;");
+        assert!(result.is_err());
+        
+        let result = parse_with_error("let x = 'unterminated string;");
         assert!(result.is_err());
     }
 }

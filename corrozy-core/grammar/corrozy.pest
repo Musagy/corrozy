@@ -20,32 +20,36 @@ statement = {
 // *************************************
 
 // identifier
-identifier = @{ ASCII_ALPHA ~ (ASCII_ALPHANUMERIC | "_")* }
+identifier = @{ (ASCII_ALPHA | "_") ~ (ASCII_ALPHANUMERIC | "_")* }
 
 // Types
 type_annotation = { basic_type | custom_type }
 basic_type = { "int" | "string" | "bool" | "float" | "any" }
 custom_type = @{ ASCII_ALPHA_UPPER ~ (ASCII_ALPHANUMERIC | "_")* }
+array_type = { (basic_type | custom_type) ~ "[]" }
 
 // define return type 
 define_type = { ":" ~ type_annotation }
 
 // Expressions
-expression = { binary_expression | primary_expression }
+expression = { binary_expression_or_single_postfix }
 
 // Binary operators
 binary_operator = { "+" | "-" | "*" | "/" | "==" | "!=" | "<" | ">" | "<=" | ">=" | "&&" | "||" }
 
 // Binary expressions
-binary_expression = { primary_expression ~ (binary_operator ~ primary_expression)+ }
+binary_expression_or_single_postfix = {
+  postfix_expression ~ (binary_operator ~ postfix_expression)*
+}
 
 // Primary expressions
 primary_expression = {
-    function_call
-  | closure_expression
-  | literal
+    literal
   | identifier
+  | function_call
   | "(" ~ expression ~ ")"
+  | closure_expression
+  | array_literal
 }
 
 // Literals
@@ -78,6 +82,9 @@ constant_declaration = {
 print_statement = { "print" ~ "(" ~ expression ~ ")" ~ ";" }
 println_statement = { "println" ~ "(" ~ expression ~ ")" ~ ";" }
 
+// Array literals
+array_literal = { "[" ~ (expression ~ ("," ~ expression)*)? ~ "]" }
+
 // Parameters
 parameter = { identifier ~ define_type? }
 parameter_list = { parameter ~ ("," ~ parameter)* }
@@ -96,7 +103,7 @@ function_call = { identifier ~ "(" ~ argument_list? ~ ")" }
 argument_list = { expression ~ ("," ~ expression)* }
 
 // Closure
-closure_expression = {"(" ~ parameter_list? ~ ")" ~ define_type? ~ "=>" ~ block}
+closure_expression = {"(" ~ parameter_list? ~ ")" ~ define_type? ~ "=>" ~ (block | expression) }
 
 // Valid identifiers
 if_statement = { "if" ~ expression ~ block ~ else_clause? }
@@ -106,3 +113,17 @@ else_clause = { "else" ~ (if_statement | block) }
 while_loop = { "while" ~ "(" ~ expression ~ ")" ~ block }
 for_loop = { "for" ~ "(" ~ for_init ~ expression? ~ ";" ~ expression? ~ ")" ~ block }
 for_init = { variable_declaration | expression_statement }
+
+// ************************************
+// * OOP grammar for Corrozy language *
+// ************************************
+
+// Postfix expressions
+postfix_expression = {
+  primary_expression
+    ~ ( 
+        ("[" ~ expression ~ "]")       // index
+      | ("." ~ identifier)             // propiedad
+      | ("." ~ function_call)          // método
+    )*
+}

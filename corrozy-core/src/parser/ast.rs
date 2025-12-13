@@ -24,22 +24,22 @@ pub enum AstNode {
         name: String, 
         params: Vec<Parameter>, 
         return_type: Option<String>,
-        body: Block
+        body: Box<Block>
     },
     IfStatement {
         condition: Box<Expression>,
-        then_block: Block,
+        then_block: Box<Block>,
         else_clause: Option<Box<ElseClause>>
     },
     WhileLoop {
         condition: Box<Expression>,
-        body: Block
+        body: Box<Block>
     },
     ForLoop {
         init: Option<Box<ForInit>>,
         condition: Option<Box<Expression>>,
         update: Option<Box<Expression>>,
-        body: Block
+        body: Box<Block>
     }
 }
 
@@ -47,21 +47,31 @@ pub enum AstNode {
 pub enum Expression {
     Literal(Literal),
     Variable(String),
-    FunctionCall { 
-        name: String, 
-        args: Vec<Expression> 
+    FunctionCall(FunctionCallExp),
+    Parenthesized(Box<Expression>),
+    Closure {
+        params: Vec<Parameter>,
+        return_type: Option<String>,
+        body: ClosureBody
+    },
+    ArrayLiteral {
+        elements: Vec<Expression>
+    },
+    Postfix {
+        base: Box<Expression>,
+        suffix: Option<PostfixSuffix>,
     },
     BinaryOp { 
         left: Box<Expression>, 
         op: BinaryOperator, 
         right: Box<Expression> 
     },
-    Parenthesized(Box<Expression>),
-    Closure {
-        params: Vec<Parameter>,
-        return_type: Option<String>,
-        body: Block
-    },
+}
+
+#[derive(Debug, Clone)]
+pub struct FunctionCallExp {
+    pub name: String,
+    pub args: Vec<Expression>,
 }
 
 #[derive(Debug, Clone)]
@@ -93,7 +103,7 @@ impl Block {
 #[derive(Debug, Clone)]
 pub enum ElseClause {
     ElseIf(Box<AstNode>), 
-    Else(Block),
+    Else(Box<Block>),
 }
 
 #[derive(Debug, Clone)]
@@ -192,4 +202,21 @@ impl StringType {
             Self::Raw(content) => format!("'{}'", content),
         }
     }
+}
+
+#[derive(Debug, Clone)]
+pub enum ClosureBody {
+    Expression(Box<Expression>),
+    Block(Box<Block>),
+}
+
+#[derive(Debug, Clone)]
+pub enum PostfixSuffix {
+    Index {
+        index_expression: Box<Expression>
+    },
+    Property {
+        name: String
+    },
+    MethodCall (FunctionCallExp)
 }

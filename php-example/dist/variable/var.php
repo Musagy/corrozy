@@ -33,3 +33,4 @@ echo "Constants:" . "\n";
 echo $MAX_USERS . "\n";
 echo $APP_NAME . "\n";
 echo $VERSION . "\n";
+$_special_name = "hola";

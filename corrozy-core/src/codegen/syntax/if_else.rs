@@ -6,14 +6,12 @@ use crate::{codegen::{syntax::{block::BlockGenerator, expression::ExpressionGen}
 
 pub struct IfElseGenerator{
     block_gen: BlockGenerator,
-    expression_gen: ExpressionGen,
 }
 
 impl IfElseGenerator {
     pub fn new() -> Self {
         Self {
             block_gen: BlockGenerator::new(),
-            expression_gen: ExpressionGen::new(),
         }
     }
 
@@ -21,7 +19,8 @@ impl IfElseGenerator {
         &self,
         condition: &Expression,
         then_block: &Block,
-        else_clause: &Option<Box<ElseClause>>, 
+        else_clause: &Option<Box<ElseClause>>,
+        expression_gen: &ExpressionGen,
         node_generator: Rc<F>
     ) -> Result<String> 
     where
@@ -31,21 +30,24 @@ impl IfElseGenerator {
 
         let condition_str = match condition {
             Expression::Parenthesized(_) => {
-                self.expression_gen.generate(condition)?
+                let node_gen: Option<Rc<F>> = None;
+                expression_gen.generate(condition, node_gen)?
             }
             _ => {
-                let expr_str = self.expression_gen.generate(condition)?;
+                let node_gen: Option<Rc<F>> = None;
+                let expr_str = expression_gen.generate(condition, node_gen)?;
                 format!("({})", expr_str)
             }
         };
 
         result.push_str(&format!("if {} {{\n", condition_str));
-        result.push_str(&self.block_gen.generate(then_block, node_generator.clone())?);
+        result.push_str(&self.block_gen.generate(then_block, expression_gen, node_generator.clone())?);
         result.push_str("}");
 
         if let Some(else_clause) = else_clause {
             result.push_str(&self.else_clause_gen(
                 else_clause,
+                expression_gen,
                 node_generator
             )?);
         }
@@ -55,7 +57,8 @@ impl IfElseGenerator {
 
     fn else_clause_gen<F>(
         &self,
-        else_clause: &Box<ElseClause>, 
+        else_clause: &Box<ElseClause>,
+        expression_gen: &ExpressionGen,
         node_generator: Rc<F>
     ) -> Result<String> 
     where
@@ -72,6 +75,7 @@ impl IfElseGenerator {
                             condition,
                             then_block,
                             else_clause,
+                            expression_gen,
                             node_generator.clone()
                         )?;
                         result.push_str(&raw);
@@ -85,7 +89,7 @@ impl IfElseGenerator {
             } 
             ElseClause::Else (body) => {
                 result.push_str(" {\n");
-                result.push_str(&self.block_gen.generate(body, node_generator.clone())?);
+                result.push_str(&self.block_gen.generate(body, expression_gen, node_generator.clone())?);
                 result.push_str("}");
 
                 Ok(result)

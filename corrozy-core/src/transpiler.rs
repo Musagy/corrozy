@@ -1,4 +1,4 @@
-use std::{path::Path};
+use std::{path::Path, rc::Rc};
 
 use anyhow::{anyhow, Ok, Result};
 use walkdir::WalkDir;
@@ -14,10 +14,13 @@ impl Transpiler {
         Self { config }
     }
 
-    pub fn transpile_project(
+    pub fn transpile_project<F>(
         &mut self,
         project_path: &Path
-    ) -> Result<()>{
+    ) -> Result<()>
+    where 
+        F: Fn(&AstNode) -> Result<String>
+    {
         let output_dir = project_path.join(&self.config.transpiler.output_dir);
         std::fs::create_dir_all(&output_dir)?;
         
@@ -25,7 +28,7 @@ impl Transpiler {
           let entry = entry?;
           if let Some(ext) = entry.path().extension() {
             if ext == "crz" {
-                self.transpile_file(entry.path(), &output_dir, &project_path)?;
+                self.transpile_file::<F>(entry.path(), &output_dir, &project_path)?;
             }
           }
         }
@@ -34,12 +37,15 @@ impl Transpiler {
     }
 
     /// Transpile a single file from Corrozy to PHP
-    fn transpile_file(
+    fn transpile_file<F>(
         &self,
         input_path: &Path,
         output_dir: &Path,
         project_path: &Path
-    ) -> Result<()> {
+    ) -> Result<()> 
+    where 
+        F: Fn(&AstNode) -> Result<String>
+    {
         let content = std::fs::read_to_string(input_path)?;
         
         let mut parser = CorrozyParserImpl::new();
@@ -63,7 +69,7 @@ impl Transpiler {
             relative_path
         };
 
-        let php_code = self.generate_php(output_relative_path, &ast)?;
+        let php_code = self.generate_php::<F>(output_relative_path, &ast)?;
         
         let output_file_path = output_dir.join(output_relative_path).with_extension("php");
         
@@ -76,11 +82,14 @@ impl Transpiler {
         Ok(())
     }
 
-    fn generate_php(
+    fn generate_php<F>(
         &self,
         relative_path: &Path,
         ast: &[AstNode],
-    ) -> Result<String> {
+    ) -> Result<String> 
+    where 
+        F: Fn(&AstNode) -> Result<String>
+    {
         let mut output = String::new();
 
         output.push_str("<?php\n");
@@ -96,8 +105,8 @@ impl Transpiler {
             }
         }
 
-        let code_gen = CodeGenerator::new(&self.config);
-        let generated_code = code_gen.generate(ast)?;
+        let code_gen = CodeGenerator::new(Rc::new(self.config.clone()));
+        let generated_code = code_gen.generate::<F>(ast)?;
         output.push_str(&generated_code);
 
         Ok(output)

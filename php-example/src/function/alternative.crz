@@ -1,0 +1,45 @@
+// función común - function common
+fn common_function() {
+  return 1 + 1;
+}
+
+// función dentro de función - function inside function
+fn outer_function() {
+  fn inner_function() {
+    return 2 + 2;
+  }
+  inner_function();
+}
+
+// arrow function de una sola linea - single line arrow function
+let arrow_function = (x: int) => x + 3;
+
+// arrow function con bloque - block arrow function
+let block_arrow_function = (x: int) => {
+  let y = x * 2;
+  y + 5;
+};
+
+// arrow function con bloque y usando variable externa - block arrow function using external variable
+let external_var = 10;
+let arrow_with_external = (x: int) => {
+  let y = x + external_var;
+  y * 2;
+};
+
+// callback dentro como parámetro de una sola linea - callback as parameter single line
+let numbers = [1, 2, 3, 4, 5];
+let doubled = numbers.map((n: int) => n * 2);
+
+// callback dentro como parámetro con bloque - callback as parameter block
+let incremented = numbers.map((n: int) => {
+  let incremented_value = n + 1;
+  incremented_value;
+});
+
+// callback dentro como parámetro con bloque y variable externa - callback as parameter block with external variable
+let factor = 3;
+let scaled = numbers.map((n: int) => {
+  let scaled_value = n * factor;
+  scaled_value;
+});

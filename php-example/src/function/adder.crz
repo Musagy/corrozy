@@ -9,6 +9,13 @@ fn adder(
   a: int,
   b: int
 ): int {
-  let result = a + b;
-  return result;
+  let int1: int = a;
+  let int2: int = b;
+
+  fn idk(): int {
+    let result = int1 + int2;
+    return result;
+  }
+  
+  return idk();
 }
