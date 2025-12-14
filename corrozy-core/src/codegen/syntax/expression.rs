@@ -2,7 +2,7 @@ use std::rc::Rc;
 
 use anyhow::{Ok, Result};
 
-use crate::{Config, codegen::syntax::{closure::ClosureGenerator, function::FunctionGenerator}, parser::ast::{AstNode, ClosureBody, Expression}};
+use crate::{Config, codegen::{CodeGenerator, syntax::{closure::ClosureGenerator, function::FunctionGenerator}}, parser::ast::{ClosureBody, Expression}};
 
 pub struct ExpressionGen {
     closure_gen: ClosureGenerator,
@@ -17,14 +17,13 @@ impl ExpressionGen {
         }
     }
 
-    pub fn generate<F>(
+    pub fn generate(
         &self,
         expr: &Expression,
-        node_generator_opt: Option<Rc<F>>
-    ) -> Result<String> 
-    where
-        F: Fn(&AstNode) -> Result<String> + ?Sized,
-    {
+        // node_generator_opt: Option<Rc<dyn Fn(&AstNode) -> Result<String>>>
+
+        code_gen_opt: Option<&CodeGenerator>, 
+    ) -> Result<String> {
         // let node_gen: Option<Rc<F>> = None;
 
         match expr {
@@ -39,17 +38,17 @@ impl ExpressionGen {
                 let name = &function_call_exp.name;
                 let args = &function_call_exp.args;
                 let arg_strs: Vec<String> = args.iter()
-                    .map(|arg| self.generate::<F>(arg, None))
+                    .map(|arg| self.generate(arg, None))
                     .collect::<Result<Vec<_>>>()?;
                 Ok(format!("{}({})", name, arg_strs.join(", ")))
             }
             Expression::BinaryOp { left, op, right } => {
-                let left_php = self.generate::<F>(left, None)?;
-                let right_php = self.generate::<F>(right, None)?;
+                let left_php = self.generate(left, None)?;
+                let right_php = self.generate(right, None)?;
                 Ok(format!("{} {} {}", left_php, op.to_php(), right_php))
             }
             Expression::Parenthesized(inner) => {
-                let inner_php = self.generate::<F>(inner, None)?;
+                let inner_php = self.generate(inner, None)?;
                 Ok(format!("({})", inner_php))
             }
 
@@ -60,17 +59,17 @@ impl ExpressionGen {
                     // and it's not inside a private/local scope, 
                     // it will be handled by the function generator (function_gen).
                     ClosureBody::Block(block) => {
-                        let node_generator = node_generator_opt
+                        let code_gen = code_gen_opt
                                     .as_ref()
                                     .ok_or_else(|| anyhow::anyhow!(
-                                        "Node generator is required for block closures"
+                                        "Code generator is required for block closures"
                                     ))?;
 
-                        let result = self.function_gen.generate_fn_headless::<F>(
+                        let result = self.function_gen.generate_fn_headless(
                             params,
                             block.as_ref(),
                             self,
-                            node_generator.clone()
+                            code_gen
                         )?;
 
                         Ok(result)

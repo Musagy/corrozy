@@ -10,7 +10,7 @@ use crate::parser::ast::{AstNode, Block, ClosureBody, ElseClause, Expression, Fu
 pub struct ClosureGenerator;
 
 struct ClosurePreloaded {
-    closure_transpiled: String,
+    _closure_transpiled: String,
     use_clause: HashSet<String>,
 }
 
@@ -86,7 +86,7 @@ impl ClosureGenerator {
                     }
                 }
                 // none name for alright it have
-                let closure_preloaded_main = self.generate_closure_multiline(
+                let _closure_preloaded_main = self.generate_closure_multiline(
                     None,
                     params,
                     return_type,
@@ -157,7 +157,7 @@ impl ClosureGenerator {
         result.push_str("}\n");
 
         ClosurePreloaded {
-            closure_transpiled: result,
+            _closure_transpiled: result,
             use_clause: use_vars
         }
     }
@@ -339,9 +339,10 @@ impl ClosureGenerator {
         }
     }
 
-    fn walk_for_declared_variables_in_block(&self, block: &Block, declared: &mut HashSet<String>) {
-        for statement in &block.statements {
-            self.walk_for_declared_variables(statement, declared);
-        }
-    }
+    // never used?
+    // fn walk_for_declared_variables_in_block(&self, block: &Block, declared: &mut HashSet<String>) {
+    //     for statement in &block.statements {
+    //         self.walk_for_declared_variables(statement, declared);
+    //     }
+    // }
 }

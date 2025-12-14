@@ -1,10 +1,7 @@
 use std::path::PathBuf;
 use anyhow::{Ok, Result};
 use clap::Parser;
-
-use corrozy_core::{
-    config, parser::ast::AstNode, transpiler
-};
+use corrozy_core::{config, transpiler};
 
 #[derive(Parser)]
 #[command(name = "corrozy")]

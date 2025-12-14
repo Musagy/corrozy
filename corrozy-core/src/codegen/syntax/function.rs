@@ -2,7 +2,7 @@ use std::rc::Rc;
 
 use anyhow::Result;
 
-use crate::{codegen::syntax::{block::BlockGenerator, expression::ExpressionGen}, parser::ast::{AstNode, Block, Parameter}, Config};
+use crate::{Config, codegen::{CodeGenerator, syntax::{block::BlockGenerator, expression::ExpressionGen}}, parser::ast::{Block, Parameter}};
 
 pub struct FunctionGenerator {
     config: Rc<Config>,
@@ -17,18 +17,16 @@ impl FunctionGenerator {
         }
     }
 
-    pub fn generate<F>(
+    pub fn generate(
         &self,
         name: &str,
         params: &[Parameter],
         return_type: &Option<String>,
         body: &Block,
         expression_gen: &ExpressionGen,
-        node_generator: Rc<F>,
-    ) -> Result<String>
-    where
-        F: Fn(&AstNode) -> Result<String>,
-    {
+        // node_generator: Rc<dyn Fn(&AstNode) -> Result<String>>,
+        code_gen: &CodeGenerator, 
+    ) -> Result<String> {
         let mut result = String::new();
 
         if self.config.transpiler.include_comments && (!params.is_empty() || return_type.is_some()) {
@@ -44,23 +42,21 @@ impl FunctionGenerator {
 
         // result.push_str(&self.generate_body(body)?);
 
-        result.push_str(&self.block_gen.generate(body, expression_gen, node_generator)?);
+        result.push_str(&self.block_gen.generate(body, expression_gen, code_gen)?);
 
         result.push_str("}\n");
 
         return Ok(result);
     }
     
-    pub fn generate_fn_headless<F>(
+    pub fn generate_fn_headless(
         &self,
         params: &[Parameter],
         body: &Block,
         expression_gen: &ExpressionGen,
-        node_generator: Rc<F>,
-    ) -> Result<String>
-    where
-        F: Fn(&AstNode) -> Result<String> + ?Sized,
-    {
+        // node_generator: Rc<dyn Fn(&AstNode) -> Result<String>>,
+        code_gen: &CodeGenerator, 
+    ) -> Result<String> {
         let mut result = String::new();
 
         // params
@@ -72,7 +68,7 @@ impl FunctionGenerator {
         result.push_str(") {\n");
 
         // body
-        result.push_str(&self.block_gen.generate(body, expression_gen, node_generator)?);
+        result.push_str(&self.block_gen.generate(body, expression_gen, code_gen)?);
         result.push_str("}\n");
 
         return Ok(result);

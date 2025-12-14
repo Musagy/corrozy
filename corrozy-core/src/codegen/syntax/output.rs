@@ -14,15 +14,12 @@ impl OutputGenerator {
         }
     }
     
-    pub fn generate<F>(
+    pub fn generate(
         &self,
         expression: &Expression,
         newline: bool
-    ) -> Result<String> 
-    where 
-        F: Fn(&AstNode) -> Result<String>
-    {
-        let php_expr = self.expression_gen.generate::<F>(expression, None)?;
+    ) -> Result<String> {
+        let php_expr = self.expression_gen.generate(expression, None)?;
 
         if newline {
             Ok(format!("echo {} . \"\\n\";\n", php_expr))

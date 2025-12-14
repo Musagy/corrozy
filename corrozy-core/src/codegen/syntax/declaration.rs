@@ -1,7 +1,7 @@
 use std::rc::Rc;
 
 use anyhow::{Ok, Result};
-use crate::{codegen::syntax::expression::ExpressionGen, config::Config, parser::ast::{AstNode, ClosureBody, Expression}};
+use crate::{codegen::syntax::expression::ExpressionGen, config::Config, parser::ast::{ClosureBody, Expression}};
 
 pub struct DeclarationGenerator {
     config: Rc<Config>,
@@ -16,16 +16,13 @@ impl DeclarationGenerator {
         }
     }
     
-    pub fn generate<F>(
+    pub fn generate(
         &self, var_type: &Option<String>,
         name: &str,
         value: &Expression,
         is_constant: bool
-    ) -> Result<String> 
-    where
-        F: Fn(&AstNode) -> Result<String> + ?Sized,
-    {
-        let php_value = self.expression_gen.generate::<F>(value, None)?;
+    ) -> Result<String> {
+        let php_value = self.expression_gen.generate(value, None)?;
         let mut output = String::new();
         
         if self.config.transpiler.include_comments {

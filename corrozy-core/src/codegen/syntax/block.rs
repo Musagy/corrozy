@@ -1,8 +1,6 @@
-use std::rc::Rc;
-
 use anyhow::{Ok, Result};
 
-use crate::{codegen::syntax::{closure::ClosureGenerator, expression::ExpressionGen}, parser::ast::{AstNode, Block, ClosureBody, Expression}};
+use crate::{codegen::{CodeGenerator, syntax::{closure::ClosureGenerator, expression::ExpressionGen}}, parser::ast::{AstNode, Block, ClosureBody, Expression}};
 
 pub struct BlockGenerator {
     closure_gen: ClosureGenerator
@@ -15,15 +13,13 @@ impl BlockGenerator {
         }
     }
 
-    pub fn generate<F>(
+    pub fn generate(
         &self,
         block: &Block,
         expression_gen: &ExpressionGen,
-        node_generator: Rc<F>
-    ) -> Result<String> 
-    where
-        F: Fn(&AstNode) -> Result<String> + ?Sized,
-    {
+        // node_generator: Rc<dyn Fn(&AstNode) -> Result<String>>,
+        code_gen: &CodeGenerator, 
+    ) -> Result<String> {
         let mut result = String::new();
 
         for statement in &block.statements {
@@ -31,7 +27,7 @@ impl BlockGenerator {
                 statement,
                 block,
                 expression_gen,
-                Rc::clone(&node_generator)
+                code_gen
             )?;
             
             for line in generated.lines() {
@@ -49,7 +45,7 @@ impl BlockGenerator {
 
             match &return_stmt.expression {
                 Some(expr) => {
-                    let return_code = expression_gen.generate::<F>(expr, None)?;
+                    let return_code = expression_gen.generate(expr, None)?;
                     result.push_str(&format!("return {};\n", return_code));
                 }
                 None => {
@@ -63,17 +59,16 @@ impl BlockGenerator {
         Ok(result)
     }
 
-    fn generate_statement<F>(
+    fn generate_statement(
         &self,
         statement: &AstNode,
         block: &Block,
         _expression_gen: &ExpressionGen,
-        node_generator: Rc<F>,
-    ) -> Result<String>
-    where
-        F: Fn(&AstNode) -> Result<String> + ?Sized,
-    {
+        // node_generator: Rc<dyn Fn(&AstNode) -> Result<String>>,
+        code_gen: &CodeGenerator, 
+    ) -> Result<String> {
         let mut generated = String::new();
+        
         match statement {
             AstNode::FunctionDeclaration {
                 name,
@@ -93,7 +88,7 @@ impl BlockGenerator {
                         generated.push_str("\n");
                     }
                     _ => {
-                        generated.push_str(node_generator(statement)?.as_str());
+                        generated.push_str(code_gen.generate_node(statement)?.as_str());
                     }
                 }
             }
@@ -105,12 +100,12 @@ impl BlockGenerator {
                         generated.push_str("\n");
                     }
                     _ => {
-                        generated.push_str(node_generator(statement)?.as_str());
+                        generated.push_str(code_gen.generate_node(statement)?.as_str());
                     }
                 }
             }
             _ => {
-                generated.push_str(node_generator(statement)?.as_str());
+                generated.push_str(code_gen.generate_node(statement)?.as_str());
             }
         };
         Ok(generated)

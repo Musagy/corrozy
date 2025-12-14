@@ -14,13 +14,10 @@ impl Transpiler {
         Self { config }
     }
 
-    pub fn transpile_project<F>(
+    pub fn transpile_project(
         &mut self,
         project_path: &Path
-    ) -> Result<()>
-    where 
-        F: Fn(&AstNode) -> Result<String>
-    {
+    ) -> Result<()> {
         let output_dir = project_path.join(&self.config.transpiler.output_dir);
         std::fs::create_dir_all(&output_dir)?;
         
@@ -28,7 +25,7 @@ impl Transpiler {
           let entry = entry?;
           if let Some(ext) = entry.path().extension() {
             if ext == "crz" {
-                self.transpile_file::<F>(entry.path(), &output_dir, &project_path)?;
+                self.transpile_file(entry.path(), &output_dir, &project_path)?;
             }
           }
         }
@@ -79,14 +76,11 @@ impl Transpiler {
         Ok(())
     }
 
-    fn generate_php<F>(
+    fn generate_php(
         &self,
         relative_path: &Path,
         ast: &[AstNode],
-    ) -> Result<String> 
-    where 
-        F: Fn(&AstNode) -> Result<String>
-    {
+    ) -> Result<String> {
         let mut output = String::new();
 
         output.push_str("<?php\n");
@@ -103,7 +97,7 @@ impl Transpiler {
         }
 
         let code_gen = CodeGenerator::new(Rc::new(self.config.clone()));
-        let generated_code = code_gen.generate::<F>(ast)?;
+        let generated_code = code_gen.generate(ast)?;
         output.push_str(&generated_code);
 
         Ok(output)

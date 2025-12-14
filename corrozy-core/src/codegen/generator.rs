@@ -6,7 +6,6 @@ use crate::{codegen::syntax::{declaration::DeclarationGenerator, exp_statement::
 
 
 pub struct CodeGenerator {
-    // config: &'a Config,
     declaration_gen : DeclarationGenerator,
     output_gen: OutputGenerator,
     function_gen: FunctionGenerator,
@@ -21,7 +20,6 @@ impl CodeGenerator {
         let expression_gen = ExpressionGen::new(config.clone());
 
         Self {
-            // config,
             declaration_gen: DeclarationGenerator::new(config.clone()),
             output_gen: OutputGenerator::new(config.clone()),
             function_gen,
@@ -31,53 +29,46 @@ impl CodeGenerator {
         }
     }
 
-    pub fn generate<F>(
+    pub fn generate(
         &self,
         ast: &[AstNode]
-    ) -> Result<String>
-    where 
-        F: Fn(&AstNode) -> Result<String>
-    {
+    ) -> Result<String> {
         let mut output = String::new();
 
         for node in ast {
-            output.push_str(&self.generate_node::<F>(node)?);
+            output.push_str(&self.generate_node(node)?);
         }
         
         Ok(output)
     }
     
-    fn generate_node<F>(
+    pub fn generate_node(
         &self,
         node: &AstNode
-    ) -> Result<String>
-    where 
-        F: Fn(&AstNode) -> Result<String>,
-    {
-        let generator = Rc::new(|node: &AstNode| self.generate_node::<F>(node));
+    ) -> Result<String> {
         match node {
             AstNode::Program { statements } => {
                 let mut result = String::new();
                 for stmt in statements {
-                    result.push_str(&self.generate_node::<F>(stmt)?);
+                    result.push_str(&self.generate_node(stmt)?);
                 }
                 Ok(result)
             }
 
             AstNode::VariableDeclaration { var_type, name, value } => {
-                self.declaration_gen.generate::<F>(var_type, name, value, false)
+                self.declaration_gen.generate(var_type, name, value, false)
             }
             
             AstNode::ConstantDeclaration { const_type, name, value } => {
-                self.declaration_gen.generate::<F>(const_type, name, value, true)
+                self.declaration_gen.generate(const_type, name, value, true)
             }
             
             AstNode::PrintStatement { expression, newline } => {
-                self.output_gen.generate::<F>(expression, *newline)
+                self.output_gen.generate(expression, *newline)
             }
             
             AstNode::ExpressionStatement { expression } => {
-                self.exp_statement_gen.generate::<F>(expression)
+                self.exp_statement_gen.generate(expression)
             }
 
             AstNode::FunctionDeclaration {
@@ -92,7 +83,7 @@ impl CodeGenerator {
                     return_type,
                     body,
                     &self.expression_gen,
-                    generator
+                    self
                 )
             }
 
@@ -102,7 +93,7 @@ impl CodeGenerator {
                     then_block,
                     else_clause,
                     &self.expression_gen,
-                    generator
+                    self
                 )
             }
 
@@ -112,7 +103,6 @@ impl CodeGenerator {
         }
 
     }
-    
 }
 
 
