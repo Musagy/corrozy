@@ -14,7 +14,7 @@ impl ExpStatementGenerator {
     }
 
     pub fn generate(&self, expression: &Expression) -> Result<String> {
-        let expr_php = self.expr_gen.generate::<>(expression, None)?;
+        let expr_php = self.expr_gen.generate(expression, None)?;
         Ok(format!("{};", expr_php))
     }
 }
