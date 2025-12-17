@@ -1,0 +1,9 @@
+// Constants
+const MAX_USERS: int = 1000;
+const APP_NAME = "Mi Aplicación";
+const VERSION = '1.0.0';
+
+println("Constants:");
+println(MAX_USERS);
+println(APP_NAME);
+println(VERSION);

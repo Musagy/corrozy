@@ -45,8 +45,8 @@ binary_expression_or_single_postfix = {
 // Primary expressions
 primary_expression = {
     literal
-  | identifier
   | function_call
+  | identifier
   | "(" ~ expression ~ ")"
   | closure_expression
   | array_literal
@@ -123,7 +123,7 @@ postfix_expression = {
   primary_expression
     ~ ( 
         ("[" ~ expression ~ "]")       // index
-      | ("." ~ identifier)             // propiedad
       | ("." ~ function_call)          // método
+      | ("." ~ identifier)             // propiedad
     )*
 }

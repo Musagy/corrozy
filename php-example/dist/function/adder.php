@@ -23,14 +23,6 @@ function adder($a, $b) {
     $int1 = $a;
     /** @var int $int2 */
     $int2 = $b;
-    /**
-     * @return int
-     */
-    function idk() use ($int1, $int2) {
-        $result = $int1 + $int2;
-        return $result * 2;
-    }
+    $idk = 
     return idk();
 }
-
-echo adder(5, 10);

@@ -57,9 +57,9 @@ pub enum Expression {
     ArrayLiteral {
         elements: Vec<Expression>
     },
-    Postfix {
+    PostfixChain {
         base: Box<Expression>,
-        suffix: Option<PostfixSuffix>,
+        suffixes: Vec<PostfixSuffix>,
     },
     BinaryOp { 
         left: Box<Expression>, 
@@ -212,11 +212,7 @@ pub enum ClosureBody {
 
 #[derive(Debug, Clone)]
 pub enum PostfixSuffix {
-    Index {
-        index_expression: Box<Expression>
-    },
-    Property {
-        name: String
-    },
-    MethodCall (FunctionCallExp)
+    Index(Box<Expression>),      // Simplifiqué un poco quitando el struct interno si solo tiene 1 campo
+    Property(String),
+    MethodCall(FunctionCallExp)
 }

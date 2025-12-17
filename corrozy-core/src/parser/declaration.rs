@@ -5,68 +5,41 @@ use crate::parser::{ast::{AstNode, Expression, PostfixSuffix}, parser::{CorrozyP
 impl CorrozyParserImpl {
     pub fn parse_postfix_expression(&mut self, pair: pest::iterators::Pair<Rule>) -> Result<Expression> {
         let mut inner_pairs = pair.into_inner();
-    
-        // 1. Inicializar la base (primary_expression)
-        // El primer par SIEMPRE es el primary_expression.
-        let base_pair = inner_pairs.next().unwrap();
-        let mut current_expression = self.parse_primary_expression(base_pair)?;
+
+        let base_pair = inner_pairs.next().ok_or_else(|| anyhow!("Postfix expression missing base"))?;
+        let base_expr = self.parse_primary_expression(base_pair)?;
+
+        let mut suffixes: Vec<PostfixSuffix> = Vec::new();
         
-        // 2. Iterar sobre todos los sufijos opcionales
-        // Cada sufijo envolverá la `current_expression` anterior.
         for suffix_pair in inner_pairs {
-            // En este punto, `suffix_pair` es uno de los grupos de sufijos:
-            // Por ejemplo, para `a.b.c`:
-            // - 1ra iteración: `suffix_pair` podría ser el grupo `(.identifier)` para `.b`
-            // - 2da iteración: `suffix_pair` podría ser el grupo `(.identifier)` para `.c`
-            
-            let suffix_rule = suffix_pair.as_rule();
-            let mut suffix_content = suffix_pair.into_inner();
-
-            let new_suffix = match suffix_rule {
-                // Indexación: `[expression]`
+            match suffix_pair.as_rule() {
                 Rule::expression => {
-                    // Obtener el contenido del corchete (la Rule::expression)
-                    let index_exp_pair = suffix_content.next().unwrap();
-                    let index_expression = self.parse_expression(index_exp_pair)?;
-                    
-                    PostfixSuffix::Index {
-                        index_expression: Box::new(index_expression)
-                    }
+                    let index_expr = self.parse_expression(suffix_pair)?;
+                    suffixes.push(PostfixSuffix::Index(Box::new(index_expr)));
                 }
                 
-                // Acceso a propiedad: `.identifier`
-                Rule::identifier => { 
-                    // Obtener el contenido del punto (la Rule::identifier)
-                    let ident_pair = suffix_content.next().unwrap();
-                    let name = ident_pair.as_str().to_string();
-                    
-                    PostfixSuffix::Property { name }
-                }
-                
-                // Llamada a método: `.function_call`
                 Rule::function_call => {
-                    // Obtener el contenido del punto (la Rule::function_call)
-                    let call_pair = suffix_content.next().unwrap();
-                    
-                    let function_call_exp = self.parse_fn_call(call_pair)?;
-                    
-                    PostfixSuffix::MethodCall(function_call_exp) 
+                    let func_call = self.parse_fn_call(suffix_pair)?;
+                    suffixes.push(PostfixSuffix::MethodCall(func_call));
                 }
-                
-                // Si no tienes reglas con nombre (`~ > Rule::...`) en Pest, 
-                // este `_` catchall podría ser necesario, pero es mejor usar reglas con nombre.
-                _ => return Err(anyhow!("Unexpected postfix operation: {:?}", suffix_rule)),
-            };
 
-            // 3. ENVOLVER: El resultado de la iteración anterior (current_expression)
-            // se convierte en la base del nuevo Expression::Postfix.
-            current_expression = Expression::Postfix {
-                base: Box::new(current_expression),
-                suffix: Some(new_suffix),
-            };
+                Rule::identifier => {
+                    let name = suffix_pair.as_str().to_string();
+                    suffixes.push(PostfixSuffix::Property(name));
+                }
+
+                _ => return Err(anyhow!("Unexpected rule in postfix: {:?}", suffix_pair.as_rule())),
+            }
         }
 
-        Ok(current_expression)
+        if suffixes.is_empty() {
+            Ok(base_expr)
+        } else {
+            Ok(Expression::PostfixChain {
+                base: Box::new(base_expr),
+                suffixes,
+            })
+        }
     }
     
     fn parse_primary_expression(&mut self, pair: pest::iterators::Pair<Rule>) -> Result<Expression> {
@@ -84,7 +57,10 @@ impl CorrozyParserImpl {
                 Rule::expression => {
                     return Ok(Expression::Parenthesized(Box::new(self.parse_expression(inner_pair)?)));
                 }
-                _ => {}
+                // Rule::
+                _ => {
+                    return Err(anyhow!("Unknown primary expression rule: {:?}", inner_pair.as_rule()));
+                }
             }
         }
         Err(anyhow!("Unknown primary expression"))
@@ -99,7 +75,7 @@ impl CorrozyParserImpl {
                 _ => {}
             }
         }
-        Err(anyhow!("No type annotation found")) // o tu tipo de error
+        Err(anyhow!("No type annotation found"))
     }
 
     fn parse_type_annotation(&mut self, pair: pest::iterators::Pair<Rule>) -> Result<String> {
@@ -145,7 +121,56 @@ impl CorrozyParserImpl {
     }
 }
 
+
 #[cfg(test)]
-mod test {
+mod tests {
+    use crate::parser::parser::CorrozyParser;
+    use super::*;
+    use pest::Parser;
     
+    #[test]
+    fn test_parse_postfix_expression() {
+        let input = "variable[0].propiedad";
+        
+        let mut pairs = CorrozyParser::parse(Rule::postfix_expression, input)
+            .expect("Failed to parse");
+        
+        let pair = pairs.next().unwrap();
+        
+        let mut parser = CorrozyParserImpl::new(); // o como lo inicialices
+        let result = parser.parse_postfix_expression(pair);
+        
+        assert!(result.is_ok());
+
+        assert!(matches!(result, Ok(Expression::PostfixChain { .. })));
+
+        if let Ok(Expression::PostfixChain { base, suffixes }) = result {
+            assert_eq!(suffixes.len(), 2);
+            assert!(matches!(*base, Expression::Variable(_)));
+            assert!(matches!(suffixes[0], PostfixSuffix::Index(_)));
+            assert!(matches!(suffixes[1], PostfixSuffix::Property(_)));
+        } else {
+            panic!("Expected PostfixChain");
+        }
+    }
+
+    #[test]
+    fn test_investigate_grammar() {
+        // Prueba diferentes inputs para ver cuáles fallan
+        let test_cases = vec![
+            "",
+            "[0].propiedad",
+            "variable.",
+            "variable[]",
+            ".propiedad",
+            "variable[[0]]",
+            "variable[",
+            "variable[0",
+        ];
+        
+        for input in test_cases {
+            let result = CorrozyParser::parse(Rule::postfix_expression, input);
+            println!("{:20} -> {:?}", input, result.is_ok());
+        }
+    }
 }

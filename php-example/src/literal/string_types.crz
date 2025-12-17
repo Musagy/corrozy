@@ -1,0 +1,9 @@
+// String types demonstration
+let interpolated_string = "Hello $nombre";
+let raw_string = 'Hello $nombre';
+let mixed_content = "Price: $precio USD";
+
+// Show string difference
+println(interpolated_string);
+println(raw_string);
+println(mixed_content);
