@@ -16,6 +16,7 @@
     
     </details>
 
+
 - [x] Constant declarations (`const PI = 3.14;`)
   - [Example](./php-example/src/variable/var.crz)
   - [Example (Output)](./php-example/dist/variable/var.php)
@@ -30,6 +31,17 @@
     </details>
 
 - [x] Prints (`println("hello")`)
+  - [Example](./php-example/src/variable/var.crz#L16)
+  - [Example (Output)](./php-example/dist/variable/var.php#L18)
+  - [Unit tests:](./tests/unit/prints.rs)
+
+    <details>  
+
+    - **[test_println](./tests/unit/prints.rs#L10)**
+    - **[test_print](./tests/unit/prints.rs#22)**
+    - **[test_constant_declaration_large_numbers](./tests/unit/prints.rs#L10)**
+    
+    </details>
 
 ## 🎲 YOLO MODE (Parsing y codegen funcionales PERO dudoso, sin tests completos/0 tests)
 - [x] namespace automatic (`namespace MyApp/UtilsM`)

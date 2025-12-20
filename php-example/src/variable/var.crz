@@ -9,12 +9,17 @@ let cualquier_cosa = "dinámico";
 let numero_magico = 42;
 let pi_aproximado = 3.14159;
 
+// Variable with underscore in the name
+let _special_name = "hola";
+
 // Output examples
 println(edad);
 println(precio);
 println(nombre);
 println(activo);
+
 println(cualquier_cosa);
+println(numero_magico);
+println(pi_aproximado);
 
-
-let _special_name = "hola";
+println(_special_name);

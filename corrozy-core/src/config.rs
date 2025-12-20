@@ -4,11 +4,8 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct Config {
-    // pub project: ProjectConfig,
     pub transpiler: TranspilerConfig,
     pub namespace: NamespaceConfig,
-    // pub syntax: SyntaxConfig,
-    // pub debugging: DebuggingConfig,
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone)]
