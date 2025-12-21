@@ -39,12 +39,20 @@
 
     - **[test_println](./tests/unit/prints.rs#L10)**
     - **[test_print](./tests/unit/prints.rs#22)**
-    - **[test_constant_declaration_large_numbers](./tests/unit/prints.rs#L10)**
+    
+    </details>
+
+- [x] namespace automatic (`namespace MyApp/Utils M`)
+  - [Unit Tests:](./corrozy-core/src/transpiler.rs#L166)
+
+    <details>  
+
+    - **[test_auto_namespace_root_file](./corrozy-core/src/transpiler.rs#L189)**
+    - **[test_auto_namespace_nested_dirs](./corrozy-core/src/transpiler.rs#L200)**
     
     </details>
 
 ## 🎲 YOLO MODE (Parsing y codegen funcionales PERO dudoso, sin tests completos/0 tests)
-- [x] namespace automatic (`namespace MyApp/UtilsM`)
 - [x] String literals (raw + interpolated)
 - [x] Basic expressions (binary operations)
 - [x] Postfix expressions (`users[1].name`)
