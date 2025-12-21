@@ -3,7 +3,7 @@ use std::{path::Path, rc::Rc};
 use anyhow::{anyhow, Ok, Result};
 use walkdir::WalkDir;
 
-use crate::{codegen::CodeGenerator, config::{Config, NamespaceMode}, parser::{ast::AstNode, parser::CorrozyParserImpl}};
+use crate::{codegen::CodeGenerator, config::{Config, NamespaceMode}, language::{AstNode, parser::CorrozyParserImpl}};
 
 pub struct Transpiler {
     config: Config,

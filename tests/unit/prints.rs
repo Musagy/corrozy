@@ -1,7 +1,7 @@
 
 #[cfg(test)]
 mod prints_declaration_tests {
-    use corrozy_core::parser::ast::AstNode;
+    use corrozy_core::language::AstNode;
 
     use crate::utils::test_utils::{extract_literal_value, parse_single_statement};
 

@@ -1,4 +1,4 @@
-use corrozy_core::parser::ast::{AstNode, Literal, StringType};
+use corrozy_core::language::{AstNode, };
 use crate::utils::test_utils::{extract_literal_value, parse_single_statement, parse_with_error};
 
 #[cfg(test)]
@@ -133,6 +133,8 @@ mod constant_declaration_tests {
 
 #[cfg(test)]
 mod literal_generation_tests {
+    use corrozy_core::language::features::expression::ast::{Literal, StringType};
+
     use super::*;
 
     #[test]

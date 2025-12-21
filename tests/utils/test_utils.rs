@@ -1,5 +1,5 @@
 use anyhow::Result;
-use corrozy_core::parser::{ ast::{AstNode, Expression}, parser::CorrozyParserImpl};
+use corrozy_core::language::{AstNode, features::expression::ast::Expression, parser::CorrozyParserImpl};
 
 pub fn parse_single_statement(code: &str) -> AstNode {
     let mut parser: CorrozyParserImpl = CorrozyParserImpl::new();

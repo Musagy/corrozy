@@ -2,7 +2,8 @@ use std::rc::Rc;
 
 use anyhow::{Ok, Result};
 
-use crate::{codegen::syntax::{declaration::DeclarationGenerator, exp_statement::ExpStatementGenerator, expression::ExpressionGen, function::FunctionGenerator, if_else::{IfElseGenerator}, output::OutputGenerator}, config::Config, parser::ast::AstNode};
+use crate::{config::Config, language::{AstNode, features::{expression::generator::ExpressionGen, function::generator::FunctionGenerator, if_else::generator::IfElseGenerator, output::generator::OutputGenerator, statement::generator::ExpStatementGenerator, declaration::generator::DeclarationGenerator}}
+};
 
 
 pub struct CodeGenerator {
