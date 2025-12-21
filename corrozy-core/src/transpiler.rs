@@ -164,30 +164,13 @@ impl Transpiler {
 
 #[cfg(test)]
 mod tests {
-    use crate::config::{NamespaceConfig, TranspilerConfig};
+    use std::path::Path;
 
-    use super::*;
-    // use std::path::PathBuf;
-
-    fn default_config_auto_ns() -> Config {
-        Config {
-            transpiler: TranspilerConfig {
-                src_dir: "src".to_string(),
-                output_dir: "out".to_string(),
-                strict_types: true,
-                include_comments: false,
-            },
-            namespace: NamespaceConfig {
-                base_namespace: "MyApp".to_string(),
-                separator: "\\".to_string(),
-                mode: NamespaceMode::Auto,
-            },
-        }
-    }
+    use crate::{Transpiler, utils::test_utils::default_corrozy_config};
 
     #[test]
     fn test_auto_namespace_root_file() {
-        let transpiler = Transpiler::new(default_config_auto_ns());
+        let transpiler = Transpiler::new(default_corrozy_config());
 
         let ns = transpiler.generate_auto_namespace(
             Path::new("main.crz")
@@ -198,7 +181,7 @@ mod tests {
 
     #[test]
     fn test_auto_namespace_nested_dirs() {
-        let transpiler = Transpiler::new(default_config_auto_ns());
+        let transpiler = Transpiler::new(default_corrozy_config());
 
         let ns = transpiler.generate_auto_namespace(
             Path::new("utils/math/add.crz")

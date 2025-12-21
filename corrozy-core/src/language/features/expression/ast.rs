@@ -105,10 +105,9 @@ impl Literal {
 
 #[derive(Debug, Clone)]
 pub enum StringType {
-    Interpolated(String),  // Para "content"
-    Raw(String),          // Para 'content'
+    Interpolated(String),
+    Raw(String),
 }
-
 
 impl StringType {
     pub fn to_php(&self) -> String {

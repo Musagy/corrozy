@@ -68,14 +68,14 @@ impl CorrozyParserImpl {
             match inner_pair.as_rule() {
                 Rule::interpolated_string => {
                     let mut value = inner_pair.as_str().to_string();
-                    value.remove(0); // Quita "
-                    value.pop();     // Quita "
+                    value.remove(0);
+                    value.pop();
                     return Ok(Literal::String(StringType::Interpolated(value)));
                 }
                 Rule::raw_string => {
                     let mut value = inner_pair.as_str().to_string();
-                    value.remove(0); // Quita '
-                    value.pop();     // Quita '
+                    value.remove(0);
+                    value.pop();
                     return Ok(Literal::String(StringType::Raw(value)));
                 }
                 _ => {}

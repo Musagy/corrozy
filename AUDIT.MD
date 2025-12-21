@@ -47,13 +47,22 @@
 
     <details>  
 
-    - **[test_auto_namespace_root_file](./corrozy-core/src/transpiler.rs#L189)**
-    - **[test_auto_namespace_nested_dirs](./corrozy-core/src/transpiler.rs#L200)**
+    - **[test_auto_namespace_root_file](./corrozy-core/src/transpiler.rs#L172)**
+    - **[test_auto_namespace_nested_dirs](./corrozy-core/src/transpiler.rs#L183)**
+    
+    </details>
+
+- [x] String literals (raw + interpolated)
+  - [Unit Tests:](./corrozy-core/src/language/features/expression/generator.rs#L113)
+
+    <details>  
+
+    - **[test_raw_string_literal](./corrozy-core/src/language/features/expression/generator.rs#L119)**
+    - **[test_interpolated_string_literal](./corrozy-core/src/language/features/expression/generator.rs#L130)**
     
     </details>
 
 ## 🎲 YOLO MODE (Parsing y codegen funcionales PERO dudoso, sin tests completos/0 tests)
-- [x] String literals (raw + interpolated)
 - [x] Basic expressions (binary operations)
 - [x] Postfix expressions (`users[1].name`)
 - [x] If/else statements

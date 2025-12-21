@@ -108,3 +108,32 @@ impl ExpressionGen {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use std::rc::Rc;
+
+    use crate::{codegen::CodeGenerator, language::parser::CorrozyParserImpl, utils::test_utils::default_corrozy_config};
+    
+    #[test]
+    fn test_raw_string_literal() {
+        let mut parser = CorrozyParserImpl::new();
+        let ast = parser.parse("'Hello, World!';").unwrap();
+        
+        let code_gen = CodeGenerator::new(Rc::new(default_corrozy_config()));
+        let php = code_gen.generate(&ast).unwrap();
+
+        assert_eq!(php.trim(), "'Hello, World!';");
+    }
+
+    #[test]
+    fn test_interpolated_string_literal() {
+        let mut parser = CorrozyParserImpl::new();
+        let ast = parser.parse("\"Hello, $name!\";").unwrap();
+        
+        let code_gen = CodeGenerator::new(Rc::new(default_corrozy_config()));
+        let php = code_gen.generate(&ast).unwrap();
+
+        assert_eq!(php.trim(), "\"Hello, $name!\";");
+    }
+}
