@@ -135,8 +135,6 @@ mod constant_declaration_tests {
 mod literal_generation_tests {
     use corrozy_core::language::features::expression::ast::{Literal, StringType};
 
-    use super::*;
-
     #[test]
     /// Test integer literal PHP generation
     fn test_integer_literal_generation() {

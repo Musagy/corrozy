@@ -1,14 +1,32 @@
-# CORROZY ROADMAP
+# Corrozy (v0.0.1)
 
-## ✅ IMPLEMENTED
+**Corrozy** is an **experimental programming language** that transpiles to **PHP**, written in **Rust**.
+
+The project focuses on exploring **language design**, **compiler/transpiler architecture**, and generating **clean, typed, readable PHP code**.
+
+> ⚠️ **Project status**: Early development / Experimental
+>
+> * APIs are unstable
+> * Breaking changes are expected
+> * Not production-ready
+
+---
+
+## ✨ What Corrozy Does Today
+
+Corrozy already supports a small but functional subset of the language, including parsing, AST generation, PHP code generation, and unit tests.
 
 ### 📤 Variables & Constants
+
 **Corrozy:**
+
 ```rust
 const PI: float = 3.14;
 let nombre: string = "Diego";
 ```
+
 **PHP output:**
+
 ```php
 /** @var float */
 const PI = 3.14;
@@ -17,50 +35,50 @@ const PI = 3.14;
 $nombre = "Diego";
 ```
 
-### 📄 Output Statements
+---
+
+### 🖨️ Output Statements
+
 **Corrozy:**
+
 ```rust
 println("Hello world");
 print("Hello");
 ```
+
 **PHP output:**
+
 ```php
 echo "Hello world" . "\n";
 echo "Hello";
 ```
 
-### 🛠️ Functions & Function Calls
+---
+
+### 🧵 String Literals
+
+Supports **raw** and **interpolated** strings.
+
 **Corrozy:**
+
 ```rust
-fn greeter(name: string): void {
-    println("Hello {}", name);
-}
-
-fn add(x: int, y: int): int {
-    return x + y;
-}
-
-greeter("Diego");
-let result = add(5, 3);
+let a = 'raw string';
+let b = "Hello {name}";
 ```
+
 **PHP output:**
+
 ```php
-function greeter(string $name): void {
-    echo "Hello " . $name . "\n";
-}
-
-function add(int $x, int $y): int {
-    return $x + $y;
-}
-
-greeter("Diego");
-$result = add(5, 3);
+$a = 'raw string';
+$b = "Hello {$name}";
 ```
 
 ---
 
-### 🔀 Control Flow (Next)
+### 🔀 Control Flow (if / else)
+
 **Corrozy:**
+
 ```rust
 if user.isActive {
     println("User is active");
@@ -68,7 +86,9 @@ if user.isActive {
     println("User is inactive");
 }
 ```
+
 **PHP output:**
+
 ```php
 if ($user->isActive) {
     echo "User is active" . "\n";
@@ -79,147 +99,48 @@ if ($user->isActive) {
 
 ---
 
-## 🚧 IN PROGRESS
+## 🧪 Testing
 
-### 🔄 Loops
-**Corrozy:**
-```rust
-while (count < 10) {
-    count = count + 1;
-}
+Corrozy includes **unit tests** for implemented features, focused on:
 
-for (let i = 0; i < 10; i++) {
-    println("Number: {}", i);
-}
-```
+* Correct parsing
+* AST correctness
+* PHP output generation
 
----
+Tests live in:
 
-## 📋 PLANNED
-
-### 📚 Arrays
-**Corrozy:**
-```rust
-let numbers: Array<int> = [1, 2, 3, 4];
-let names: Array<string> = ["John", "Jane"];
-```
-**PHP output:**
-```php
-/** @var int[] */
-$numbers = [1, 2, 3, 4];
-
-/** @var string[] */
-$names = ["John", "Jane"];
-```
-
-### 📞 Closures
-**Corrozy:**
-```rust
-let add = (x: int, y: int): int => {
-    return x + y;
-};
-```
-**PHP output:**
-```php
-$add = function(int $x, int $y): int {
-    return $x + $y;
-};
-```
-
-### 🏗️ Classes
-**Corrozy:**
-```rust
-class User extends Model impl[HasFactory, SoftDeletes] {
-    let name: string;
-    let email: string;
-    
-    fn getName(): string {
-        return this.name;
-    }
-}
-```
-
-**PHP output:**
-```php
-class User extends Model {
-    use HasFactory;
-    use SoftDeletes;
-
-    $name = string;
-    $email =  string;
-    
-
-    function getName() {
-        return this->name;
-    }
-}
-```
-
-### 📦 Records (Key-Value Objects)
-
-**Corrozy:**
-```rust
-let config: Record<string, string> = {
-    host: "localhost",
-    port: "3306"
-};
-```
-
-**PHP output:**
-
-```php
-/** @var array<string, string> */
-$config = [
-    'host' => 'localhost',
-    'port' => '3306'
-];
-```
-
-### 🎯 Interfaces
-**Corrozy:**
-```rust
-interface User: Model(), HasFactory {
-    name: string;
-    email: string;
-}
-```
-
-### 🎁 Imports / Namespaces
-**Corrozy:**
-```rust
-// File: App/src/router/user.crz
-import http.Request;
-```
-**PHP output:**
-```php
-<?php
-namespace App\Router;
-
-use App\Http\Request;
-```
-
-### 🔧 Custom Types
-**Corrozy:**
-```rust
-type Number = int | float;
-type UserStatus = "active" | "inactive" | "pending";
-```
+* `tests/` (workspace-level integration & unit tests)
+* `corrozy-core/src/**` (feature-local tests)
 
 ---
 
-## 🔮 FUTURE FEATURES
+## 🧠 Goals
 
-### 🧬 Advanced Types
-- Generic types: `Array<T>`
-- Nullable types: `address: string?`
-- default value: `name: string = "Osito Perú"`
+Corrozy is built to:
 
-### 🎭 Traits & Advanced OOP
-- Trait implementations
-- Abstract classes
-- Method overriding
+* Explore language and syntax design
+* Learn compiler and transpiler architecture in Rust
+* Generate readable and typed PHP
+* Experiment with "screaming architecture" and feature-based organization
 
-### 🚀 Framework Integration
-- Laravel template: `corrozy init laravel`
-- WordPress plugin template: `corrozy init wordpress-plugin`
-- API template: `corrozy init api`
+---
+
+## 📍 Versioning
+
+Current version: **v0.0.1**
+
+* No stability guarantees
+* Frequent refactors
+* Structure and APIs may change at any time
+
+---
+
+## 🗺️ Roadmap
+
+See [roadmap.md](./roadmap.md) for planned and future features.
+
+---
+
+## 📄 License
+
+MIT License
