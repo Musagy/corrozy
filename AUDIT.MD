@@ -53,17 +53,29 @@
     </details>
 
 - [x] String literals (raw + interpolated)
-  - [Unit Tests:](./corrozy-core/src/language/features/expression/generator.rs#L113)
+  - [Unit Tests:](./corrozy-core/src/language/features/expression/generator.rs#L102)
 
     <details>  
 
-    - **[test_raw_string_literal](./corrozy-core/src/language/features/expression/generator.rs#L119)**
-    - **[test_interpolated_string_literal](./corrozy-core/src/language/features/expression/generator.rs#L130)**
+    - **[test_raw_string_literal](./corrozy-core/src/language/features/expression/generator.rs#L108)**
+    - **[test_interpolated_string_literal](./corrozy-core/src/language/features/expression/generator.rs#L119)**
     
     </details>
 
-## 🎲 YOLO MODE (Parsing y codegen funcionales PERO dudoso, sin tests completos/0 tests)
 - [x] Basic expressions (binary operations)
+  - [Unit Tests:](./corrozy-core/src/language/features/expression/generator.rs#L102)
+
+    <details>  
+
+    - **[test_generates_simple_addition](./corrozy-core/src/language/features/expression/generator.rs#L130)**
+    - **[test_generates_multiple_operations](./corrozy-core/src/language/features/expression/generator.rs#L141)**
+    - **[test_generates_logical_and](./corrozy-core/src/language/features/expression/generator.rs#L152)**
+    - **[test_generates_logical_or](./corrozy-core/src/language/features/expression/generator.rs#L163)**
+    
+    </details>
+
+
+## 🎲 YOLO MODE (Parsing y codegen funcionales PERO dudoso, sin tests completos/0 tests)
 - [x] Postfix expressions (`users[1].name`)
 - [x] If/else statements
 - [x] Function call (`add(1, 2)`)

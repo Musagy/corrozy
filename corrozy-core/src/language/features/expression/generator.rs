@@ -29,14 +29,6 @@ impl ExpressionGen {
             Expression::Variable(name) => {
                 Ok(format!("${}", name))
             }
-            Expression::FunctionCall(function_call_exp) => {
-                let name = &function_call_exp.name;
-                let args = &function_call_exp.args;
-                let arg_strs: Vec<String> = args.iter()
-                    .map(|arg| self.generate(arg, None))
-                    .collect::<Result<Vec<_>>>()?;
-                Ok(format!("{}({})", name, arg_strs.join(", ")))
-            }
             Expression::BinaryOp { left, op, right } => {
                 let left_php = self.generate(left, None)?;
                 let right_php = self.generate(right, None)?;
@@ -45,6 +37,14 @@ impl ExpressionGen {
             Expression::Parenthesized(inner) => {
                 let inner_php = self.generate(inner, None)?;
                 Ok(format!("({})", inner_php))
+            }
+            Expression::FunctionCall(function_call_exp) => {
+                let name = &function_call_exp.name;
+                let args = &function_call_exp.args;
+                let arg_strs: Vec<String> = args.iter()
+                    .map(|arg| self.generate(arg, None))
+                    .collect::<Result<Vec<_>>>()?;
+                Ok(format!("{}({})", name, arg_strs.join(", ")))
             }
             Expression::PostfixChain { base, suffixes } => {
                 let mut result = self.generate(base, None)?;
@@ -80,24 +80,13 @@ impl ExpressionGen {
                                     .ok_or_else(|| anyhow::anyhow!(
                                         "Code generator is required for block closures"
                                     ))?;
-
-                        let result = self.function_gen.generate_fn_headless(
-                            params,
-                            block.as_ref(),
-                            self,
-                            code_gen
-                        )?;
-
+                        let result = self.function_gen.generate_fn_headless(params, block.as_ref(), self, code_gen)?;
+                        
                         Ok(result)
                     }
                     ClosureBody::Expression( .. ) => {
-                        let result = self.closure_gen.generate(
-                            None,
-                            params,
-                            return_type,
-                            body,
-                            None
-                        )?;
+                        let result = self.closure_gen.generate(None, params, return_type,                             body, None)?;
+
                         Ok(result)
                     }
                 }
@@ -136,4 +125,49 @@ mod tests {
 
         assert_eq!(php.trim(), "\"Hello, $name!\";");
     }
+
+    #[test]
+    fn test_generates_simple_addition() {
+        let mut parser = CorrozyParserImpl::new();
+        let ast = parser.parse("5 + 3;").unwrap();
+        
+        let code_gen = CodeGenerator::new(Rc::new(default_corrozy_config()));
+        let php = code_gen.generate(&ast).unwrap();
+
+        assert_eq!(php.trim(), "5 + 3;");
+    }
+
+    #[test]
+    fn test_generates_multiple_operations() {
+        let mut parser = CorrozyParserImpl::new();
+        let ast = parser.parse("10 - 2 * 3;").unwrap();
+        
+        let code_gen = CodeGenerator::new(Rc::new(default_corrozy_config()));
+        let php = code_gen.generate(&ast).unwrap();
+
+        assert_eq!(php.trim(), "10 - 2 * 3;");
+    }
+
+    #[test]
+    fn test_generates_logical_and() {
+        let mut parser = CorrozyParserImpl::new();
+        let ast = parser.parse("true && false;").unwrap();
+
+        let code_gen = CodeGenerator::new(Rc::new(default_corrozy_config()));
+        let php = code_gen.generate(&ast).unwrap();
+
+        assert_eq!(php.trim(), "true && false;");
+    }
+
+    #[test]
+    fn test_generates_logical_or() {
+        let mut parser = CorrozyParserImpl::new();
+        let ast = parser.parse("true || false;").unwrap();
+
+        let code_gen = CodeGenerator::new(Rc::new(default_corrozy_config()));
+        let php = code_gen.generate(&ast).unwrap();
+
+        assert_eq!(php.trim(), "true || false;");
+    }
+
 }
