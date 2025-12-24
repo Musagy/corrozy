@@ -1,9 +1,8 @@
 
 #[cfg(test)]
 mod prints_declaration_tests {
-    use corrozy_core::language::AstNode;
+    use corrozy_core::{language::AstNode, utils::test_utils::{extract_literal_value, parse_single_statement}};
 
-    use crate::utils::test_utils::{extract_literal_value, parse_single_statement};
 
     #[test]
     /// Test variable declaration with double quoted string

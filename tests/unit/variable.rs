@@ -1,8 +1,9 @@
-use corrozy_core::language::{AstNode, };
-use crate::utils::test_utils::{extract_literal_value, parse_single_statement, parse_with_error};
+use corrozy_core::language::AstNode;
 
 #[cfg(test)]
 mod variable_declaration_tests {
+    use corrozy_core::utils::test_utils::{extract_literal_value, parse_single_statement};
+
     use super::*;
 
     #[test]
@@ -83,6 +84,8 @@ mod variable_declaration_tests {
 
 #[cfg(test)]
 mod constant_declaration_tests {
+    use corrozy_core::utils::test_utils::{extract_literal_value, parse_single_statement};
+
     use super::*;
 
     #[test]
@@ -214,7 +217,8 @@ mod literal_generation_tests {
 
 #[cfg(test)]
 mod syntax_error_tests {
-    use super::*;
+    use corrozy_core::utils::test_utils::parse_with_error;
+
 
     #[test]
     /// Test that missing semicolon causes parser error
