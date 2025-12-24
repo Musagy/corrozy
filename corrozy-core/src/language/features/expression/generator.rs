@@ -2,11 +2,12 @@ use std::rc::Rc;
 
 use anyhow::{Ok, Result};
 
-use crate::{Config, codegen::CodeGenerator, language::features::{closure::{ClosureGenerator, ast::ClosureBody}, expression::ast::Expression, function::generator::FunctionGenerator, postfix::ast::PostfixSuffix}};
+use crate::{Config, codegen::CodeGenerator, language::features::{closure::{ClosureGenerator, ast::ClosureBody}, expression::ast::Expression, function::generator::FunctionGenerator, postfix::generator::PostfixGen}};
 
 pub struct ExpressionGen {
     closure_gen: ClosureGenerator,
     function_gen: FunctionGenerator,
+    postfix_gen: PostfixGen,
 }
 
 impl ExpressionGen {
@@ -14,6 +15,7 @@ impl ExpressionGen {
         Self {
             closure_gen: ClosureGenerator::new(),
             function_gen: FunctionGenerator::new(config),
+            postfix_gen: PostfixGen::new(),
         }
     }
 
@@ -47,29 +49,7 @@ impl ExpressionGen {
                 Ok(format!("{}({})", name, arg_strs.join(", ")))
             }
             Expression::PostfixChain { base, suffixes } => {
-                let mut result = self.generate(base, None)?;
-
-                for suffix in suffixes {
-                    match suffix {
-                        PostfixSuffix::Index(index_expr) => {
-                            let index_php = self.generate(index_expr, None)?;
-                            result = format!("{}[{}]", result, index_php);
-                        }
-                        PostfixSuffix::MethodCall(func_call) => {
-                            let name = &func_call.name;
-                            let args = &func_call.args;
-                            let arg_strs: Vec<String> = args.iter()
-                                .map(|arg| self.generate(arg, None))
-                                .collect::<Result<Vec<_>>>()?;
-                            result = format!("{}->{}({})", result, name, arg_strs.join(", "));
-                        }
-                        PostfixSuffix::Property(prop_name) => {
-                            result = format!("{}->{}", result, prop_name);
-                        }
-                    }
-                }
-
-                Ok(result)
+                self.postfix_gen.generate(base, suffixes, self)
             }
             // Important: This is only for global scope, excluding function bodies. Block_gen handles function bodies.
             Expression::Closure { params, return_type, body } => {

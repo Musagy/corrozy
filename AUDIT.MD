@@ -74,9 +74,19 @@
     
     </details>
 
+- [x] Postfix expressions (`users[1].name`)
+  - [Unit Tests:](./corrozy-core/src/language/features/postfix/generator.rs#L45)
+
+    <details>  
+
+    - **[test_postfix_by_index](./corrozy-core/src/language/features/postfix/generator.rs#L51)**
+    - **[test_postfix_method_call](./corrozy-core/src/language/features/postfix/generator.rs#L60)**
+    - **[test_postfix_property_access](./corrozy-core/src/language/features/postfix/generator.rs#L69)**
+    - **[test_postfix_chain](./corrozy-core/src/language/features/postfix/generator.rs#L78)**
+    
+    </details>
 
 ## 🎲 YOLO MODE (Parsing y codegen funcionales PERO dudoso, sin tests completos/0 tests)
-- [x] Postfix expressions (`users[1].name`)
 - [x] If/else statements
 - [x] Function call (`add(1, 2)`)
 - [x] Return statements
