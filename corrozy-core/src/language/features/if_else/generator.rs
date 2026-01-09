@@ -87,3 +87,87 @@ impl IfElseGenerator {
         }
     }
 }
+
+
+#[cfg(test)]
+mod tests {
+    use std::rc::Rc;
+
+    use crate::{codegen::CodeGenerator, language::parser::CorrozyParserImpl, utils::test_utils::default_corrozy_config};
+
+
+    #[test]
+    fn test_generate_simple_if() {
+        let mut parser = CorrozyParserImpl::new();
+
+        let ast = parser.parse(r#"
+            if (true) {
+                println("ok");
+            }
+        "#).unwrap();
+
+        let code_gen = CodeGenerator::new(Rc::new(default_corrozy_config()));
+        let php = code_gen.generate(&ast).unwrap();
+
+        assert!(php.contains("if (true) {"));
+        assert!(php.contains(r#"echo "ok" . "\n""#));
+    }
+
+    #[test]
+    fn test_generate_if_else() {
+        let mut parser = CorrozyParserImpl::new();
+        let ast = parser.parse(r#"
+            if (true) {
+                println("ok");
+            } else {
+                println("not ok");
+            }
+        "#).unwrap();
+        let code_gen = CodeGenerator::new(Rc::new(default_corrozy_config()));
+        let php = code_gen.generate(&ast).unwrap();
+        assert!(php.contains("if (true) {"));
+        assert!(php.contains(r#"echo "ok" . "\n""#));
+        assert!(php.contains("} else {"));
+        assert!(php.contains(r#"echo "not ok" . "\n""#));
+    }
+
+    #[test]
+    fn test_generate_if_elseif_else() {
+        let mut parser = CorrozyParserImpl::new();
+        let ast = parser.parse(r#"
+            if (x > 0) {
+                println("positive");
+            } else if (x < 0) {
+                println("negative");
+            } else {
+                println("zero");
+            }
+        "#).unwrap();
+        let code_gen = CodeGenerator::new(Rc::new(default_corrozy_config()));
+        let php = code_gen.generate(&ast).unwrap();
+        assert!(php.contains("if ($x > 0) {"));
+        assert!(php.contains(r#"echo "positive" . "\n""#));
+        assert!(php.contains("} elseif ($x < 0) {"));
+        assert!(php.contains(r#"echo "negative" . "\n""#));
+        assert!(php.contains("} else {"));
+        assert!(php.contains(r#"echo "zero" . "\n""#));
+    }
+    
+    #[test]
+    fn test_generate_if_elseif() {
+        let mut parser = CorrozyParserImpl::new();
+        let ast = parser.parse(r#"
+            if (x > 0) {
+                println("positive");
+            } else if (x < 0) {
+                println("negative");
+            }
+        "#).unwrap();
+        let code_gen = CodeGenerator::new(Rc::new(default_corrozy_config()));
+        let php = code_gen.generate(&ast).unwrap();
+        assert!(php.contains("if ($x > 0) {"));
+        assert!(php.contains(r#"echo "positive" . "\n""#));
+        assert!(php.contains("} elseif ($x < 0) {"));
+        assert!(php.contains(r#"echo "negative" . "\n""#));
+    }
+}

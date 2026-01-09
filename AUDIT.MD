@@ -86,8 +86,19 @@
     
     </details>
 
-## 🎲 YOLO MODE (Parsing y codegen funcionales PERO dudoso, sin tests completos/0 tests)
 - [x] If/else statements
+  - [Unit Tests:](./corrozy-core/src/language/features/if_else/generator.rs#L93)
+
+    <details>  
+
+    - **[test_generate_simple_if](./corrozy-core/src/language/features/if_else/generator.rs#L100)**
+    - **[test_generate_if_else](./corrozy-core/src/language/features/if_else/generator.rs#L117)**
+    - **[test_generate_if_elseif_else](./corrozy-core/src/language/features/if_else/generator.rs#L135)**
+    - **[test_generate_if_elseif](./corrozy-core/src/language/features/if_else/generator.rs#L157)**
+    
+    </details>
+
+## 🎲 YOLO MODE (Parsing y codegen funcionales PERO dudoso, sin tests completos/0 tests)
 - [x] Function call (`add(1, 2)`)
 - [x] Return statements
 
