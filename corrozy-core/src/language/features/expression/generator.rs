@@ -2,12 +2,13 @@ use std::rc::Rc;
 
 use anyhow::{Ok, Result};
 
-use crate::{Config, codegen::CodeGenerator, language::features::{closure::{ClosureGenerator, ast::ClosureBody}, expression::ast::Expression, function::generator::FunctionGenerator, postfix::generator::PostfixGen}};
+use crate::{Config, codegen::CodeGenerator, language::features::{closure::{ClosureGenerator, ast::ClosureBody}, expression::ast::Expression, function::generator::FunctionGenerator, function_call::{generator::FnCallGen}, postfix::generator::PostfixGen}};
 
 pub struct ExpressionGen {
     closure_gen: ClosureGenerator,
     function_gen: FunctionGenerator,
     postfix_gen: PostfixGen,
+    function_call_gen: FnCallGen,
 }
 
 impl ExpressionGen {
@@ -16,6 +17,7 @@ impl ExpressionGen {
             closure_gen: ClosureGenerator::new(),
             function_gen: FunctionGenerator::new(config),
             postfix_gen: PostfixGen::new(),
+            function_call_gen: FnCallGen::new(),
         }
     }
 
@@ -40,13 +42,8 @@ impl ExpressionGen {
                 let inner_php = self.generate(inner, None)?;
                 Ok(format!("({})", inner_php))
             }
-            Expression::FunctionCall(function_call_exp) => {
-                let name = &function_call_exp.name;
-                let args = &function_call_exp.args;
-                let arg_strs: Vec<String> = args.iter()
-                    .map(|arg| self.generate(arg, None))
-                    .collect::<Result<Vec<_>>>()?;
-                Ok(format!("{}({})", name, arg_strs.join(", ")))
+            Expression::FunctionCall( function_call_exp) => {
+                self.function_call_gen.generate(function_call_exp, self)
             }
             Expression::PostfixChain { base, suffixes } => {
                 self.postfix_gen.generate(base, suffixes, self)

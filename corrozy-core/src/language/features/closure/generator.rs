@@ -338,11 +338,4 @@ impl ClosureGenerator {
             }
         }
     }
-
-    // never used?
-    // fn walk_for_declared_variables_in_block(&self, block: &Block, declared: &mut HashSet<String>) {
-    //     for statement in &block.statements {
-    //         self.walk_for_declared_variables(statement, declared);
-    //     }
-    // }
 }

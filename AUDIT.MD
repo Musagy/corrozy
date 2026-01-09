@@ -98,8 +98,19 @@
     
     </details>
 
-## 🎲 YOLO MODE (Parsing y codegen funcionales PERO dudoso, sin tests completos/0 tests)
 - [x] Function call (`add(1, 2)`)
+  - [Unit Tests:](./corrozy-core/src/language/features/function_call/generator.rs#L27)
+
+    <details>  
+
+    - **[test_function_call_no_args](./corrozy-core/src/language/features/function_call/generator.rs#L34)**
+    - **[test_function_call_with_args](./corrozy-core/src/language/features/function_call/generator.rs#L45)**
+    - **[test_nested_function_calls](./corrozy-core/src/language/features/function_call/generator.rs#L56)**
+    
+    </details>
+
+
+## 🎲 YOLO MODE (Parsing y codegen funcionales PERO dudoso, sin tests completos/0 tests)
 - [x] Return statements
 
 ## ⚠️ WIP (Parsing + Codegen en trabajo, sin tests completos/0 tests)
